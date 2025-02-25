@@ -82,7 +82,7 @@
 
             <p class="flex flex-col items-center justify-center mt-10 text-center text-md text-gray-500">
               <span>Already have an account?</span>
-              <a href="{{route('login')}}" class="text-indigo-500 hover:text-indigo-600 no-underline hover:underline cursor-pointer transition ease-in duration-300">Sign in</a>
+              <a href="{{route('login')}}" class="bg-primary-500 hover:text-indigo-600 no-underline hover:underline cursor-pointer transition ease-in duration-300">Sign in</a>
             </p>
           </form>
         </div>
