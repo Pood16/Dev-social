@@ -5,16 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registration Page</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-  <div class="relative min-h-screen flex">
-    <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 bg-white">
+  <div class="relative min-h-screen flex bg-amber-500">
+    <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 bg-amber-500">
       <!-- Left Panel -->
-      <div class="sm:w-1/2 xl:w-2/5 h-full hidden md:flex flex-auto items-center justify-start p-10 overflow-hidden bg-indigo-900 text-white bg-no-repeat bg-cover relative" style="background-image: url(https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80);">
-        <div class="absolute bg-gradient-to-b from-indigo-900 to-purple-900 opacity-75 inset-0 z-0"></div>
+      <div class="sm:w-1/2 xl:w-2/5 h-full hidden md:flex flex-auto items-center justify-start p-10 overflow-hidden bg-amber-500 text-white bg-no-repeat bg-cover relative" style="background-image: url(https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80);">
+        <div class="absolute bg-gradient-to-b from-yellow-100 to-amber-900 opacity-75 inset-0 z-0"></div>
         <div class="absolute right-0 w-16 min-h-screen" style="border-top: 60rem solid #fff; border-left: 25rem solid transparent;"></div>
         <div class="w-full max-w-md z-10">
-          <div class="sm:text-4xl xl:text-5xl font-bold leading-tight mb-6">Create Your Account</div>
+          <div class="sm:text-4xl xl:text-5xl font-bold leading-tight mb-6 text-amber-500">Create Your Account</div>
           <div class="sm:text-sm xl:text-md text-gray-200 font-normal">
             Join our community today and unlock exclusive features. Our platform provides you with powerful tools to manage your projects, connect with like-minded individuals, and stay updated with the latest trends in your industry.
           </div>
@@ -75,14 +76,14 @@
 
 
             <div>
-              <button type="submit" class="w-full flex justify-center bg-gradient-to-r from-indigo-500 to-purple-600 hover:bg-gradient-to-l hover:from-purple-500 hover:to-indigo-600 text-gray-100 p-4 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500">
+              <button type="submit" class="w-full flex justify-center bg-yellow-500 text-gray-100 p-4 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500">
                 Create Account
               </button>
             </div>
 
             <p class="flex flex-col items-center justify-center mt-10 text-center text-md text-gray-500">
               <span>Already have an account?</span>
-              <a href="{{route('login')}}" class="bg-primary-500 hover:text-indigo-600 no-underline hover:underline cursor-pointer transition ease-in duration-300">Sign in</a>
+              <a href="{{route('login')}}" class="hover:text-yellow-600 no-underline hover:underline cursor-pointer transition ease-in duration-300">Sign in</a>
             </p>
           </form>
         </div>

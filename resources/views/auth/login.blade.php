@@ -6,17 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Page</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
   <div class="relative min-h-screen flex">
     <div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0 bg-white">
       <!-- Left Panel -->
       <div class="sm:w-1/2 xl:w-2/5 h-full hidden md:flex flex-auto items-center justify-start p-10 overflow-hidden bg-purple-900 text-white bg-no-repeat bg-cover relative" style="background-image: url(https://images.unsplash.com/photo-1579451861283-a2239070aaa9?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1950&amp;q=80);">
-        <div class="absolute bg-gradient-to-b from-blue-900 to-gray-900 opacity-75 inset-0 z-0"></div>
+        <div class="absolute bg-gradient-to-b from-yellow-100 to-amber-900 opacity-75 inset-0 z-0"></div>
         <div class="absolute right-0 w-16 min-h-screen" style="border-top: 60rem solid #fff; border-left: 25rem solid transparent;"></div>
         <img src="" class="h-96 absolute right-5 mr-5">
         <div class="w-full max-w-md z-10">
-          <div class="sm:text-4xl xl:text-5xl font-bold leading-tight mb-6">Réseau Social pour Développeurs</div>
+          <div class="sm:text-4xl xl:text-5xl font-bold leading-tight mb-6 text-amber-500">Réseau Social pour Développeurs</div>
           <div class="sm:text-sm xl:text-md text-gray-200 font-normal">
             What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s when an unknown printer took a galley of type and scrambled it to make a type specimen book it has?
           </div>
@@ -70,7 +71,7 @@
             </div>
 
             <div>
-              <button type="submit" class="w-full flex justify-center bg-gradient-to-r from-indigo-500 to-blue-600 hover:bg-gradient-to-l hover:from-blue-500 hover:to-indigo-600 text-gray-100 p-4 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500">
+              <button type="submit" class="w-full flex justify-center bg-yellow-500 text-gray-100 p-4 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500">
                 Sign in
               </button>
             </div>
