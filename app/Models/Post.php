@@ -12,6 +12,7 @@ class Post extends Model
         'title',
         'content',
         'user_id',
+        'hashtags'
     ];
 
     public function user() {

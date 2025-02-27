@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('post_hashtag', function (Blueprint $table) {
+        Schema::create('hashtag_post', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->foreignId('hashtag_id')->constrained()->onDelete('cascade');
@@ -18,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('post_hashtag');
+        Schema::dropIfExists('hashtag_post');
     }
 };

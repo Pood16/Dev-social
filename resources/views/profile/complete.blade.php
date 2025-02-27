@@ -128,7 +128,7 @@
 
                             <div class="mb-6">
                                 <label for="bio" class="block text-gray-700 font-medium mb-2">Bio*</label>
-                                <textarea id="bio" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-amber-500 focus:ring focus:ring-amber-200 focus:ring-opacity-50 transition-colors duration-300" name="bio" placeholder="Tell us about yourself, your experience, and what you're passionate about..." required>
+                                <textarea id="bio" rows="3" class="w-full px-2 py-3 rounded-lg border border-gray-300 focus:border-amber-500 focus:ring focus:ring-amber-200 focus:ring-opacity-50 transition-colors duration-300" name="bio" placeholder="Tell us about yourself, your experience, and what you're passionate about..." required>
                                     {{$user->bio ?? 'no bio yet, try to express yourself'}}
                                 </textarea>
                             </div>
@@ -138,7 +138,7 @@
                     <!-- Technical Details -->
                     <div class="mb-6">
                         <label for="languages" class="block text-gray-700 font-medium mb-2">Programming Languages*</label>
-                        <input value="{{$user->languages ?? 'no programming languages to display try to add some'}}" type="text" id="languages" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-amber-500 focus:ring focus:ring-amber-200 focus:ring-opacity-50 transition-colors duration-300" name="language" placeholder="e.g., JavaScript, Python, Java (comma separated)" required>
+                        <input value="{{$user->language ?? 'no programming languages to display try to add some'}}" type="text" id="languages" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-amber-500 focus:ring focus:ring-amber-200 focus:ring-opacity-50 transition-colors duration-300" name="language" placeholder="e.g., JavaScript, Python, Java (comma separated)" required>
                         <p class="text-gray-500 text-sm mt-1">Enter the programming languages you're proficient in, separated by commas</p>
                     </div>
 

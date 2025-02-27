@@ -1,16 +1,4 @@
 <x-app-layout>
-    <!-- success message  -->
-    @if(session('success'))
-        <div class="bg-green-100 border-l-4 border-green-400 text-green-700 px-4 py-2 rounded-r relative mb-3 shadow-2xl">
-        <span class="block sm:inline">{{ session('success') }}</span>
-        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';">
-            <svg class="fill-current h-4 w-4 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 8.586l-4.95-4.95a1 1 0 10-1.414 1.415L8.586 10l-4.95 4.95a1 1 0 101.414 1.415L10 11.414l4.95 4.95a1 1 0 101.415-1.414L11.414 10l4.95-4.95a1 1 0 10-1.414-1.415L10 8.586z" clip-rule="evenodd" />
-            </svg>
-        </button>
-        </div>
-    @endif
-
     <div class="min-h-screen flex flex-col">
       <!-- Profile Header -->
       <div class="relative">
@@ -114,8 +102,44 @@
             <div class="bg-white shadow-2xl rounded-lg p-6 mb-6">
                 <div class="flex justify-between items-center mb-4">
                   <h2 class="text-lg font-medium text-gray-900">Skills</h2>
-                  <button class="text-sm text-amber-600 hover:text-amber-700">
-                    <i class="fas fa-plus mr-1"></i> Add </button>
+                  <button onclick="openSkillModal()" class="text-sm text-amber-600 hover:text-amber-700">
+                    <i class="fas fa-plus mr-1"></i> Add
+                </button>
+                <div id="skillModal" class="fixed inset-0 hidden">
+                    <!-- Modal backdrop -->
+                    <div class="absolute inset-0 bg-gray-900 opacity-70"></div>
+                    <!-- Modal content -->
+                    <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+                        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-medium text-gray-900">Add New Skill</h3>
+                                    <button onclick="closeSkillModal()" class="text-gray-400 hover:text-gray-500">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <form action="" method="POST">
+                                    @csrf
+                                    <div class="mb-4">
+                                        <label for="skill" class="block text-sm font-medium text-gray-700 mb-2">Skill Name</label>
+                                        <input type="text" name="skill" id="skill"
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                                    </div>
+                                    <div class="flex justify-end gap-3">
+                                        <button type="button" onclick="closeSkillModal()"
+                                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                                            Cancel
+                                        </button>
+                                        <button type="submit"
+                                            class="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-md">
+                                            Add Skill
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     @empty($user->language)
@@ -126,7 +150,86 @@
                         @endforeach
                     @endempty
                 </div>
-              </div>
+            </div>
+            <!-- Projects -->
+
+            <div class="lg:col-span-1">
+                <!-- Projects -->
+                <div class="bg-white shadow-2xl rounded-lg p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-medium text-gray-900">Latest Projects</h2>
+                        <button onclick="openProjectModal()" class="text-sm text-amber-600 hover:text-amber-700">
+                            <i class="fas fa-plus mr-1"></i> Add
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        @forelse($user->projects ?? [] as $project)
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <span class="text-gray-700">{{ $project->title }}</span>
+                                <div class="flex space-x-2">
+                                    <a href="{{ $project->url }}" target="_blank"
+                                    class="text-amber-600 hover:text-amber-700">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <a href="{{ $project->github_url }}" target="_blank"
+                                    class="text-gray-600 hover:text-gray-700">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-gray-500 text-sm">No projects added yet</p>
+                        @endforelse
+                    </div>
+                </div>
+                <!-- project modal -->
+                <div id="projectModal" class="fixed inset-0 hidden">
+                    <!-- Modal backdrop -->
+                    <div class="absolute inset-0 bg-gray-900 opacity-70"></div>
+
+                    <!-- Modal content -->
+                    <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+                        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-medium text-gray-900">Add New Project</h3>
+                                    <button onclick="closeProjectModal()" class="text-gray-400 hover:text-gray-500">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <form action="" method="POST">
+                                    @csrf
+                                    <div class="mb-4">
+                                        <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Project Title</label>
+                                        <input type="text" name="title" id="title" required
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 py-2">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="url" class="block text-sm font-medium text-gray-700 mb-2">Project URL</label>
+                                        <input type="url" name="url" id="url"
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 py-2">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="github_url" class="block text-sm font-medium text-gray-700 mb-2">GitHub URL</label>
+                                        <input type="url" name="github_url" id="github_url"
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 py-2">
+                                    </div>
+                                    <div class="flex justify-end gap-3">
+                                        <button type="button" onclick="closeProjectModal()"
+                                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                                            Cancel
+                                        </button>
+                                        <button type="submit"
+                                            class="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-md">
+                                            Add Project
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
           </div>
 
           <!-- Column 3-->
@@ -151,5 +254,23 @@
         </div>
       </div>
     </div>
+    <script>
+        // skills modal
+        function openSkillModal() {
+            document.getElementById('skillModal').classList.remove('hidden');
+        }
+
+        function closeSkillModal() {
+            document.getElementById('skillModal').classList.add('hidden');
+        }
+        // projects modal
+        function openProjectModal() {
+            document.getElementById('projectModal').classList.remove('hidden');
+        }
+
+        function closeProjectModal() {
+            document.getElementById('projectModal').classList.add('hidden');
+        }
+    </script>
   </x-app-layout>
 

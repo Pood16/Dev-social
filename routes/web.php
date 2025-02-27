@@ -2,13 +2,14 @@
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-
+Route::get('/index', [HomeController::class, 'index'])->middleware('auth')->name('feeds');
 // complete profile
 Route::group(['prefix'=> 'profile'], function () {
     Route::get('/', [ProfileController::class, 'show'])->middleware('auth')->name('profile');
@@ -21,6 +22,7 @@ Route::group(['prefix'=> 'profile'], function () {
 
 //  post routes
 Route::group(['prefix'=> 'post'], function () {
+    Route::get('/index', [PostController::class,'index'])->middleware('auth')->name('feeds');
     Route::post('/store', [PostController::class,'store'])->middleware('auth')->name('post.store');
 });
 
