@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('content');
             $table->text('hashtags')->nullable();
+            $table->string('links')->nullable();
             $table->string('image')->nullable();
             $table->timestamps();
         });

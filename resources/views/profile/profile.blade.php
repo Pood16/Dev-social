@@ -167,11 +167,11 @@
                             <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <span class="text-gray-700">{{ $project->title }}</span>
                                 <div class="flex space-x-2">
-                                    <a href="{{ $project->url }}" target="_blank"
+                                    <a href="{{ $project->lien_git }}" target="_blank"
                                     class="text-amber-600 hover:text-amber-700">
                                         <i class="fas fa-external-link-alt"></i>
                                     </a>
-                                    <a href="{{ $project->github_url }}" target="_blank"
+                                    <a href="{{ $project->lien_git }}" target="_blank"
                                     class="text-gray-600 hover:text-gray-700">
                                         <i class="fab fa-github"></i>
                                     </a>
@@ -197,7 +197,7 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
-                                <form action="" method="POST">
+                                <form action="{{route('project.store')}}" method="POST">
                                     @csrf
                                     <div class="mb-4">
                                         <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Project Title</label>
@@ -210,8 +210,8 @@
                                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 py-2">
                                     </div>
                                     <div class="mb-4">
-                                        <label for="github_url" class="block text-sm font-medium text-gray-700 mb-2">GitHub URL</label>
-                                        <input type="url" name="github_url" id="github_url"
+                                        <label for="github_url" class="block text-sm font-medium text-gray-700 mb-2">Brief description</label>
+                                        <input type="text" name="description" id="github_url"
                                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 py-2">
                                     </div>
                                     <div class="flex justify-end gap-3">

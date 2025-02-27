@@ -12,7 +12,9 @@ class Post extends Model
         'title',
         'content',
         'user_id',
-        'hashtags'
+        'hashtags',
+        'links',
+        'image'
     ];
 
     public function user() {

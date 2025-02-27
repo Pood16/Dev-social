@@ -8,15 +8,14 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
 
     public function index()
     {
-        $posts = Post::with(['user', 'hashtags'])
-            ->latest()
-            ->paginate(10);
+        $posts = Post::with(['user', 'hashtags'])->latest()->limit(10)->get();
         return view('index', compact('posts'));
     }
 
@@ -29,18 +28,23 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
+
+
         // Validate the form inputs
         $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'hashtags' => 'nullable|string',
         ]);
+
+
 
         // Handle image upload
         $imagePath = null;
         if ($request->hasFile('image')) {
+
             $imagePath = $request->file('image')->store('posts', 'public');
+
         }
 
         // Process hashtags
@@ -51,7 +55,7 @@ class PostController extends Controller
             // Validate hashtag format
             foreach ($hashtagArray as $tag) {
                 if (!preg_match('/^[a-zA-Z0-9_]+$/', $tag)) {
-                    return back()->withErrors(['hashtags' => 'Hashtags can only contain letters, numbers and underscores'])->withInput();
+                    return back()->with(['error' => 'Hashtags can only separated by a comma (,)']);
                 }
             }
             // Create or get existing hashtags
@@ -66,16 +70,17 @@ class PostController extends Controller
             'content' => $request->content,
             'user_id' => Auth::id(),
             'image' => $imagePath,
+            'links' => $request->links,
             'hashtags' => implode(',', $hashtagArray ?? [])
         ]);
+
 
         // Attach hashtags to the post
         if (!empty($hashtags)) {
             $post->hashtags()->sync($hashtags);
         }
 
-        return redirect()->route('feeds')
-            ->with('uccess', 'Post created successfully');
+        return redirect()->route('feeds')->with('uccess', 'Post created successfully');
     }
 
     /**
@@ -83,7 +88,10 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return view('posts.show', compact('post'));
+        if ($post->user_id !== Auth::id()) {
+            abort(403);
+        }
+        return view('post.show', compact('post'));
     }
 
     /**
@@ -97,38 +105,50 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePostRequest $request, Post $post)
-    {
-        $request->validate([
-            'content' => 'required',
-            'hashtags' => 'array',
-
-        ]);
-
-        $imagepath = $request->file('image') ? $request->file('image')->store('posts', 'public') : $post->image;
-        $post->update([
-            'content' => $request->content,
-            'image' => $imagepath,
-        ]);
-
-        if ($request->hashtags) {
-            $hashtags = collect($request->hashtags)->map(function ($tag) {
-                return Hashtag::firstOrCreate(['name' => $tag])->id;
-            });
-            $post->hashtags()->sync($hashtags);
-        }
-
-        return redirect()->route('posts.show', $post)->with('success', 'Post updated successfully');
+    public function update(Request $request, Post $post)
+{
+    if ($post->user_id !== Auth::id()) {
+        abort(403);
     }
+
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'links' => 'nullable|url|max:255',
+        'hashtags' => 'nullable|string',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    if ($request->hasFile('image')) {
+
+        if ($post->image) {
+            Storage::delete($post->image);
+        }
+        $validated['image'] = $request->file('image')->store('posts', 'public');
+    }
+
+    $post->update($validated);
+
+    return redirect()->route('feeds')->with('success', 'Post updated successfully');
+}
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Post $post)
     {
-        // $this->authorize('delete', $post);
+        if ($post->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Delete the post image if it exists
+        if ($post->image) {
+            Storage::delete($post->image);
+        }
+
         $post->delete();
-        return redirect()->route('posts.index')->with('success', 'Post deleted successfully');
+
+        return redirect()->route('feeds')->with('success', 'Post deleted successfully');
     }
 
     /**

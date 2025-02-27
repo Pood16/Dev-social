@@ -27,6 +27,17 @@
                 </button>
             </div>
         @endif
+        <!-- error message  -->
+        @if(session('error'))
+          <div class="bg-green-100 border-l-4 border-red-400 text-red-700 px-4 py-2 rounded-r relative mb-3 shadow-2xl">
+              <span class="block sm:inline">{{ session('error') }}</span>
+              <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';">
+                  <svg class="fill-current h-4 w-4 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 8.586l-4.95-4.95a1 1 0 10-1.414 1.415L8.586 10l-4.95 4.95a1 1 0 101.414 1.415L10 11.414l4.95 4.95a1 1 0 101.415-1.414L11.414 10l4.95-4.95a1 1 0 10-1.414-1.415L10 8.586z" clip-rule="evenodd"/>
+                  </svg>
+              </button>
+          </div>
+        @endif
         <!-- Page Content -->
         <main>
             {{ $slot }}
