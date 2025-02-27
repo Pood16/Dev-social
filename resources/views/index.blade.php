@@ -116,7 +116,7 @@
                         <!-- Comments List -->
                         <div class="space-y-4">
                             @foreach($post->comments as $comment)
-                                <div class="flex gap-3">
+                                <div class="flex gap-3" id="comment-{{ $comment->id }}">
                                     <img src="{{ $comment->user->profile_picture ? asset('storage/' . $comment->user->profile_picture) : asset('images/default-avatar.png') }}"
                                         class="h-8 w-8 rounded-full object-cover">
                                     <div class="flex-1">
@@ -128,18 +128,14 @@
                                             <p class="text-sm text-gray-700">{{ $comment->comment }}</p>
                                         </div>
                                         @if($comment->user_id === Auth::id())
-                                            <div class="flex gap-2 mt-1">
-                                                <button onclick="editComment({{ $comment->id }}, '{{ addslashes($comment->content) }}')"
-                                                    class="text-xs text-gray-500 hover:text-amber-600">
-                                                    Edit
-                                                </button>
-                                                <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-xs text-gray-500 hover:text-red-600">Delete</button>
-                                                </form>
-                                            </div>
-                                        @endif
+                                        <div class="flex gap-2 mt-1">
+                                            
+                                            <button onclick="deleteComment({{ $comment->id }})"
+                                                class="text-xs text-gray-500 hover:text-red-600">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    @endif
                                     </div>
                                 </div>
                             @endforeach
@@ -351,7 +347,7 @@
         }
     })
 
-    // comment
+    // add comment
     function submitComment(e, postId) {
         e.preventDefault();
 
@@ -381,7 +377,7 @@
             const submitButton = form.querySelector('#submit-comment');
             const originalButtonText = submitButton.innerHTML;
             submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+            // submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
 
             fetch(`/post/${postId}/comments`, {
                 method: 'POST',
@@ -407,8 +403,8 @@
                     }
 
                     const newComment = `
-                        <div class="flex gap-3">
-                            <img src= '/storage/app/public/profile-images/' + ${data.comment.user.profile_picture}'
+                        <div class="flex gap-3" id="comment-${data.comment.id}">
+                            <img src= '/storage/${data.comment.user.profile_picture}'
                                 class="h-8 w-8 rounded-full object-cover">
                             <div class="flex-1">
                                 <div class="bg-gray-50 rounded-lg p-3">
@@ -419,28 +415,17 @@
                                     <p class="text-sm text-gray-700">${data.comment.comment}</p>
                                 </div>
                                 <div class="flex gap-2 mt-1">
-                                    <button onclick="editComment(${data.comment.id}, '${data.comment.comment?.replace(/'/g, "\\'")}')"
-                                        class="text-xs text-gray-500 hover:text-amber-600">
-                                        Edit
+                                    <button onclick="deleteComment(${data.comment.id})"
+                                        class="text-xs text-gray-500 hover:text-red-600">
+                                        Delete
                                     </button>
-                                    <form action="/comments/${data.comment.id}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-xs text-gray-500 hover:text-red-600">Delete</button>
-                                    </form>
+
                                 </div>
                             </div>
                         </div>
                     `;
                     commentsList.insertAdjacentHTML('afterbegin', newComment);
                     form.reset();
-
-                    // Show success message
-                    const successMessage = document.createElement('div');
-                    successMessage.className = 'text-sm text-green-600 mt-2';
-                    successMessage.textContent = 'Comment posted successfully!';
-                    form.appendChild(successMessage);
-                    setTimeout(() => successMessage.remove(), 3000);
                 }
             })
             .catch(error => {
@@ -462,6 +447,50 @@
             console.error('Critical error:', error);
             alert('Something went wrong. Please refresh the page and try again.');
         }
+    }
+
+// delete comment
+
+function deleteComment(commentId) {
+    if (!confirm('Are you sure you want to delete this comment?')) {
+        return;
+    }
+
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (!token) {
+        throw new Error('CSRF token not found');
+    }
+
+    fetch(`/post/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+            'Accept': 'application/json'
+        },
+    })
+    .then(async response => {
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Remove the comment element from DOM
+            const commentElement = document.querySelector(`#comment-${commentId}`);
+            if (commentElement) {
+                commentElement.remove();
+            }else{
+                alert('lahcen ouirghane');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to delete comment. Please try again.');
+    });
 }
 
 </script>

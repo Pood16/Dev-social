@@ -36,16 +36,23 @@ class CommentController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Comment added successfully');
+        return redirect()->back();
     }
 
     public function destroy(Comment $comment)
-    {
-        if ($comment->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $comment->delete();
-        return back()->with('success', 'Comment deleted successfully');
+{
+    if ($comment->user_id !== Auth::id()) {
+        abort(403);
     }
+
+    $comment->delete();
+
+    if (request()->expectsJson()) {
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+    return redirect()->back();
+}
 }
