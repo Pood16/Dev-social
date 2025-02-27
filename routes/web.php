@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
@@ -28,6 +29,8 @@ Route::group(['prefix'=> 'post'], function () {
     Route::get('/{post}/show', [PostController::class,'show'])->middleware('auth')->name('post.show');
     Route::put('/{post}', [PostController::class,'update'])->middleware('auth')->name('post.update');
     Route::delete('/{post}', [PostController::class, 'destroy'])->middleware('auth')->name('post.destroy');
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('posts.comments.store');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 });
 // project routes
 Route::group(['prefix'=> 'project'], function () {

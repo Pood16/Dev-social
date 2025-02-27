@@ -93,6 +93,58 @@
                             <span>Share</span>
                         </button>
                     </div>
+                    <!-- Comments Section -->
+                    <div class="mt-6 border-t border-gray-100 pt-4">
+                        <!-- Comment Form -->
+                        <form action="{{ route('posts.comments.store', $post) }}" method="POST" class="mb-4">
+                            @csrf
+                            <div class="flex gap-3 items-center">
+                                <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default-avatar.png') }}"
+                                    class="h-8 w-8 rounded-full object-cover">
+                                <div class="flex-1">
+                                    <textarea name="content" rows="2"
+                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
+                                        placeholder="Write a comment..."></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="px-5 py-2 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700">
+                                    Comment
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Comments List -->
+                        <div class="space-y-4">
+                            @foreach($post->comments as $comment)
+                                <div class="flex gap-3">
+                                    <img src="{{ $comment->user->profile_picture ? asset('storage/' . $comment->user->profile_picture) : asset('images/default-avatar.png') }}"
+                                        class="h-8 w-8 rounded-full object-cover">
+                                    <div class="flex-1">
+                                        <div class="bg-gray-50 rounded-lg p-3">
+                                            <div class="flex justify-between items-center mb-1">
+                                                <h4 class="text-sm font-medium text-gray-900">{{ $comment->user->name }}</h4>
+                                                <p class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</p>
+                                            </div>
+                                            <p class="text-sm text-gray-700">{{ $comment->comment }}</p>
+                                        </div>
+                                        @if($comment->user_id === Auth::id())
+                                            <div class="flex gap-2 mt-1">
+                                                <button onclick="editComment({{ $comment->id }}, '{{ addslashes($comment->content) }}')"
+                                                    class="text-xs text-gray-500 hover:text-amber-600">
+                                                    Edit
+                                                </button>
+                                                <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-xs text-gray-500 hover:text-red-600">Delete</button>
+                                                </form>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             </div>
         @empty

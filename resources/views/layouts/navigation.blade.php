@@ -36,8 +36,8 @@
                         class="cursor-pointer max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
                         id="user-menu-button">
                         <span class="sr-only">Open user menu</span>
-                        <img class="h-8 w-8 rounded-full"
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9UdkG68P9AHESMfKJ-2Ybi9pfnqX1tqx3wQ&s"
+                        <img class="h-8 w-8 rounded-full object-cover"
+                            src="{{Storage::url(Auth::user()->profile_picture) ?? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9UdkG68P9AHESMfKJ-2Ybi9pfnqX1tqx3wQ&s'}}"
                             alt="User avatar">
                     </button>
                 </div>
