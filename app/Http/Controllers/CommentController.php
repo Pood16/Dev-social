@@ -9,16 +9,32 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-    public function store(Request $request, Post $post){
+    public function store(Request $request, $id )
+    {
 
         $validated = $request->validate([
-            'content' => 'required|string|max:1000',
+            'comment' => 'required|string|max:1000',
         ]);
+        $post = Post::findOrFail($id);
 
         $comment = $post->comments()->create([
-            'comment' => $validated['content'],
+            'comment' => $validated['comment'],
             'user_id' => Auth::id(),
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'comment' => [
+                    'id' => $comment->id,
+                    'comment' => $comment->comment,
+                    'user' => [
+                        'name' => Auth::user()->name,
+                        'profile_picture' => Auth::user()->profile_picture
+                    ],
+                ]
+            ]);
+        }
 
         return back()->with('success', 'Comment added successfully');
     }

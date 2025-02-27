@@ -96,7 +96,7 @@
                     <!-- Comments Section -->
                     <div class="mt-6 border-t border-gray-100 pt-4">
                         <!-- Comment Form -->
-                        <form action="{{ route('posts.comments.store', $post) }}" method="POST" class="mb-4">
+                        <form onsubmit="submitComment(event, {{ $post->id }})" id="commentForm-{{$post->id}}" class="mb-4">
                             @csrf
                             <div class="flex gap-3 items-center">
                                 <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default-avatar.png') }}"
@@ -106,7 +106,7 @@
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
                                         placeholder="Write a comment..."></textarea>
                                 </div>
-                                <button type="submit"
+                                <button id="submit-comment" type="submit"
                                     class="px-5 py-2 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700">
                                     Comment
                                 </button>
@@ -350,6 +350,120 @@
             closeDeleteModal();
         }
     })
+
+    // comment
+    function submitComment(e, postId) {
+        e.preventDefault();
+
+        try {
+            const form = document.getElementById(`commentForm-${postId}`);
+            if (!form) {
+                throw new Error('Comment form not found');
+            }
+
+            const textarea = form.querySelector('textarea[name="content"]');
+            if (!textarea) {
+                throw new Error('Comment textarea not found');
+            }
+
+            const content = textarea.value.trim();
+            if (!content) {
+                alert('Please write a comment before submitting');
+                return;
+            }
+
+            const token = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (!token) {
+                throw new Error('CSRF token not found');
+            }
+
+            // Show loading state
+            const submitButton = form.querySelector('#submit-comment');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+
+            fetch(`/post/${postId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ comment: content })
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const commentsList = form.closest('.mt-6')?.querySelector('.space-y-4');
+                    if (!commentsList) {
+                        throw new Error('Comments list container not found');
+                    }
+
+                    const newComment = `
+                        <div class="flex gap-3">
+                            <img src= '/storage/app/public/profile-images/' + ${data.comment.user.profile_picture}'
+                                class="h-8 w-8 rounded-full object-cover">
+                            <div class="flex-1">
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h4 class="text-sm font-medium text-gray-900">${data.comment.user.name}</h4>
+                                        <p class="text-xs text-gray-500">Just now</p>
+                                    </div>
+                                    <p class="text-sm text-gray-700">${data.comment.comment}</p>
+                                </div>
+                                <div class="flex gap-2 mt-1">
+                                    <button onclick="editComment(${data.comment.id}, '${data.comment.comment?.replace(/'/g, "\\'")}')"
+                                        class="text-xs text-gray-500 hover:text-amber-600">
+                                        Edit
+                                    </button>
+                                    <form action="/comments/${data.comment.id}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-xs text-gray-500 hover:text-red-600">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    commentsList.insertAdjacentHTML('afterbegin', newComment);
+                    form.reset();
+
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'text-sm text-green-600 mt-2';
+                    successMessage.textContent = 'Comment posted successfully!';
+                    form.appendChild(successMessage);
+                    setTimeout(() => successMessage.remove(), 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error details:', error);
+                // Show error message to user
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'text-sm text-red-600 mt-2';
+                errorMessage.textContent = 'Failed to post comment. Please try again.';
+                form.appendChild(errorMessage);
+                setTimeout(() => errorMessage.remove(), 3000);
+            })
+            .finally(() => {
+                // Reset button state
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            });
+
+        } catch (error) {
+            console.error('Critical error:', error);
+            alert('Something went wrong. Please refresh the page and try again.');
+        }
+}
+
 </script>
 </x-app-layout>
 
