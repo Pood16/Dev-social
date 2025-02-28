@@ -1,7 +1,7 @@
 <x-app-layout>
 
 
-<!-- Posts Feed Section -->
+<!-- Posts Feed  -->
 <div class="max-w-4xl mx-auto px-4 py-8">
     <div class="space-y-6">
         @forelse($posts as $post)
@@ -17,7 +17,7 @@
                         </div>
                     </div>
 
-                    <!-- Post Actions Dropdown -->
+                    <!-- Post Actions  -->
                     <div class="relative">
                         @if($post->user_id === Auth::id())
                             <div class="flex items-center space-x-2">
@@ -45,7 +45,7 @@
                     <h2 class="text-xl font-bold mb-2">{{ $post->title }}</h2>
                     <p class="text-gray-700 mb-4">{{ $post->content }}</p>
 
-                    <!-- Links (if exists) -->
+                    <!-- Links  -->
                     @if($post->links)
                         <div class="mb-4">
                             <a href="{{ $post->links }}"
@@ -57,9 +57,9 @@
                         </div>
                     @endif
 
-                    <!-- Post Image (if exists) -->
+                    <!-- Post Image  -->
                     @if($post->image)
-                        <div class="mb-4">
+                        <div class="mb-4 ">
                             <img src="{{ Storage::url($post->image) }}"
                                 alt="Post image"
                                 class="w-full rounded-lg">
@@ -70,7 +70,7 @@
                     @if($post->hashtags)
                         <div class="flex flex-wrap gap-2 mt-3">
                             @foreach(explode(',', $post->hashtags) as $tag)
-                                <a href=""
+                                <a href="#"
                                     class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm hover:bg-amber-200">
                                     #{{ trim($tag) }}
                                 </a>
@@ -291,7 +291,7 @@
 </div>
 
 
-<!-- start script -->
+<!-- script -->
 <script>
     function openPostModal() {
         document.getElementById('postModal').classList.remove('hidden');
@@ -327,11 +327,11 @@
     });
     // delete post
     function deletePost(postId) {
-        // Set up the form action
+
         const deleteForm = document.getElementById('deleteForm');
         deleteForm.action = `/post/${postId}`;
 
-        // Show the modal
+
         document.getElementById('deleteModal').classList.remove('hidden');
     }
 
@@ -339,7 +339,7 @@
         document.getElementById('deleteModal').classList.add('hidden');
     }
 
-    // Close modal when clicking outside
+
     window.addEventListener('click', function(e) {
         const deleteModal = document.getElementById('deleteModal');
         if (e.target === deleteModal) {
@@ -373,11 +373,6 @@
                 throw new Error('CSRF token not found');
             }
 
-            // Show loading state
-            const submitButton = form.querySelector('#submit-comment');
-            const originalButtonText = submitButton.innerHTML;
-            submitButton.disabled = true;
-            // submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
 
             fetch(`/post/${postId}/comments`, {
                 method: 'POST',
@@ -430,28 +425,18 @@
             })
             .catch(error => {
                 console.error('Error details:', error);
-                // Show error message to user
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'text-sm text-red-600 mt-2';
-                errorMessage.textContent = 'Failed to post comment. Please try again.';
-                form.appendChild(errorMessage);
-                setTimeout(() => errorMessage.remove(), 3000);
             })
-            .finally(() => {
-                // Reset button state
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonText;
-            });
+
 
         } catch (error) {
             console.error('Critical error:', error);
-            alert('Something went wrong. Please refresh the page and try again.');
         }
     }
 
 // delete comment
 
 function deleteComment(commentId) {
+
     if (!confirm('Are you sure you want to delete this comment?')) {
         return;
     }
@@ -478,7 +463,6 @@ function deleteComment(commentId) {
     })
     .then(data => {
         if (data.success) {
-            // Remove the comment element from DOM
             const commentElement = document.querySelector(`#comment-${commentId}`);
             if (commentElement) {
                 commentElement.remove();
@@ -494,6 +478,12 @@ function deleteComment(commentId) {
 }
 
 // likes
+document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.like-button').forEach(button => {
+                const postId = button.dataset.postId;
+                checkLikeStatus(postId);
+            });
+        });
 async function toggleLike(postId) {
             try {
                 const response = await fetch(`/post/${postId}/like`, {
@@ -537,7 +527,7 @@ async function toggleLike(postId) {
                 const icon = button.querySelector('.like-icon');
 
                 if (data.isLiked) {
-                    icon.style.fill = 'currentColor';
+                    icon.classList.add('fas', 'text-red-600');
                 }
             } catch (error) {
                 console.error('Error checking like status:', error);
