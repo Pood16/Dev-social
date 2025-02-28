@@ -27,13 +27,10 @@ class Post extends Model
 
 
     public function likes() {
-        return $this->hasMany(Like::class)->where('liked', true);
+        return $this->hasMany(Like::class);
     }
 
-    public function disLikes(){
-        return $this->hasMany(Like::class)->where('liked', false);
-    }
-
+ 
     public function hashtags() {
         return $this->belongsToMany(Hashtag::class);
     }

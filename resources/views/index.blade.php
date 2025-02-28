@@ -81,8 +81,8 @@
                     <!-- Post Actions -->
                     <div class="flex items-center space-x-4 mt-4 text-gray-500">
                         <button onclick="toggleLike({{$post->id}})" data-post-id="{{$post->id}}" class="like-button flex items-center space-x-2 hover:text-amber-600">
-                            <i class="far fa-heart"></i>
-                            <span>Like</span>
+                            <i class="far fa-heart like-icon"></i>
+                            <span class="likes-count">{{$post->likes->count()}}</span>
                         </button>
 
                         <button class="flex items-center space-x-2 hover:text-amber-600">
@@ -496,7 +496,7 @@ function deleteComment(commentId) {
 // likes
 async function toggleLike(postId) {
             try {
-                const response = await fetch(`/posts/${postId}/like`, {
+                const response = await fetch(`/post/${postId}/like`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -505,6 +505,7 @@ async function toggleLike(postId) {
                 });
 
                 const data = await response.json();
+
 
                 if (data.success) {
                     const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
@@ -516,9 +517,11 @@ async function toggleLike(postId) {
 
                     // Update icon state
                     if (data.isLiked) {
-                        icon.style.fill = 'currentColor';
+                        icon.classList.remove('far');
+                        icon.classList.add('fas', 'text-red-600');
                     } else {
-                        icon.style.fill = 'none';
+                        icon.classList.remove('fas', 'text-red-600');
+                        icon.classList.add('far');
                     }
                 }
             } catch (error) {
@@ -527,7 +530,7 @@ async function toggleLike(postId) {
         }
         async function checkLikeStatus(postId) {
             try {
-                const response = await fetch(`/posts/${postId}/check-like`);
+                const response = await fetch(`/post/${postId}/check-like`);
                 const data = await response.json();
 
                 const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);

@@ -16,7 +16,7 @@ class PostController extends Controller
 
     public function index()
     {
-        $posts = Post::with(['user', 'comments'])->latest()->limit(10)->get();
+        $posts = Post::with(['user', 'comments', 'likes'])->latest()->limit(10)->get();
         return view('index', compact('posts'));
     }
 
@@ -214,7 +214,7 @@ class PostController extends Controller
     public function checkLike(Post $post)
     {
         return response()->json([
-            'isLiked' => $post->likes()->where('user_id', auth()->id())->exists()
+            'isLiked' => $post->likes()->where('user_id', Auth::id())->exists()
         ]);
     }
 
