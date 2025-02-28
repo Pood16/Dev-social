@@ -80,10 +80,11 @@
 
                     <!-- Post Actions -->
                     <div class="flex items-center space-x-4 mt-4 text-gray-500">
-                        <button class="flex items-center space-x-2 hover:text-amber-600">
+                        <button onclick="toggleLike({{$post->id}})" data-post-id="{{$post->id}}" class="like-button flex items-center space-x-2 hover:text-amber-600">
                             <i class="far fa-heart"></i>
                             <span>Like</span>
                         </button>
+
                         <button class="flex items-center space-x-2 hover:text-amber-600">
                             <i class="far fa-comment"></i>
                             <span>Comment</span>
@@ -129,7 +130,6 @@
                                         </div>
                                         @if($comment->user_id === Auth::id())
                                         <div class="flex gap-2 mt-1">
-                                            
                                             <button onclick="deleteComment({{ $comment->id }})"
                                                 class="text-xs text-gray-500 hover:text-red-600">
                                                 Delete
@@ -492,6 +492,54 @@ function deleteComment(commentId) {
         alert('Failed to delete comment. Please try again.');
     });
 }
+
+// likes
+async function toggleLike(postId) {
+            try {
+                const response = await fetch(`/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
+                    const icon = button.querySelector('.like-icon');
+                    const count = button.querySelector('.likes-count');
+
+                    // Update like count
+                    count.textContent = data.likesCount;
+
+                    // Update icon state
+                    if (data.isLiked) {
+                        icon.style.fill = 'currentColor';
+                    } else {
+                        icon.style.fill = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling like:', error);
+            }
+        }
+        async function checkLikeStatus(postId) {
+            try {
+                const response = await fetch(`/posts/${postId}/check-like`);
+                const data = await response.json();
+
+                const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
+                const icon = button.querySelector('.like-icon');
+
+                if (data.isLiked) {
+                    icon.style.fill = 'currentColor';
+                }
+            } catch (error) {
+                console.error('Error checking like status:', error);
+            }
+        }
 
 </script>
 </x-app-layout>

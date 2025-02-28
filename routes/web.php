@@ -31,6 +31,8 @@ Route::group(['prefix'=> 'post'], function () {
     Route::delete('/{post}', [PostController::class, 'destroy'])->middleware('auth')->name('post.destroy');
     Route::post('/{id}/comments', [CommentController::class, 'store'])->name('posts.comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/{post}/like', [PostController::class, 'toggleLike'])->name('posts.like');
+    Route::get('/{post}/check-like', [PostController::class, 'checkLike'])->name('posts.checkLike');
 });
 // project routes
 Route::group(['prefix'=> 'project'], function () {

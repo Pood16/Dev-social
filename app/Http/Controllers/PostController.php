@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Models\Hashtag;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
@@ -154,13 +155,13 @@ class PostController extends Controller
     /**
      * Like the specified post.
      */
-    public function like(Post $post)
-    {
-        $post->likes()->create([
-            'user_id' => Auth::id()
-        ]);
-        return redirect()->back()->with('success', 'Post liked successfully');
-    }
+    // public function like(Post $post)
+    // {
+    //     $post->likes()->create([
+    //         'user_id' => Auth::id()
+    //     ]);
+    //     return redirect()->back()->with('success', 'Post liked successfully');
+    // }
 
     /**
      * Comment on the specified post.
@@ -187,4 +188,34 @@ class PostController extends Controller
         $posts = Hashtag::where('name', $hashtag)->firstOrFail()->posts()->paginate(10);
         return view('posts.index', compact('posts'));
     }
+
+
+    public function toggleLike(Post $post)
+    {
+        $like = $post->likes()->where('user_id', Auth::id())->first();
+
+        if ($like) {
+            $like->delete();
+            $isLiked = false;
+        } else {
+            $post->likes()->create([
+                'user_id' => Auth::id()
+            ]);
+            $isLiked = true;
+        }
+
+        return response()->json([
+            'success' => true,
+            'likesCount' => $post->likes()->count(),
+            'isLiked' => $isLiked
+        ]);
+    }
+
+    public function checkLike(Post $post)
+    {
+        return response()->json([
+            'isLiked' => $post->likes()->where('user_id', auth()->id())->exists()
+        ]);
+    }
+
 }
