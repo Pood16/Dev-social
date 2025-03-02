@@ -41,6 +41,10 @@ Route::group(['prefix'=> 'project'], function () {
 });
 
 
+// notifications routes
+Route::get('/mark-as-read', [PostController::class,'markAsRead'])->name('mark-as-read');
+
+
 
 Route::get('/index', function () {
     return view('index');

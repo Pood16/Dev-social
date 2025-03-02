@@ -24,6 +24,8 @@ class User extends Authenticatable
         'profile_picture',
         'cover_picture',
         'bio',
+        'linkedin',
+        'portfolio',
     ];
 
     /**
@@ -129,4 +131,6 @@ class User extends Authenticatable
     public function connections() {
         return $this->sentConnections()->where('status', 'accepted')->union($this->receivedConnections()->where('status', 'accepted'));
     }
+
+    
 }

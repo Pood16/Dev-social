@@ -7,17 +7,19 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class notifications extends Notification
+class LikeNotification extends Notification
 {
     use Queueable;
+    protected $post;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct($post)
     {
-        //
+        $this->post = $post;
     }
+
 
     /**
      * Get the notification's delivery channels.
@@ -26,7 +28,7 @@ class notifications extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
     /**
@@ -48,7 +50,9 @@ class notifications extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'message' => 'A new like has been added to your post',
+            'post_id' => $this->post->id,
+            'post_title' => $this->post->title,
         ];
     }
 }

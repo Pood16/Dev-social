@@ -153,7 +153,11 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="flex justify-end">
+                    <div class="flex justify-end space-x-4">
+                        <a href="{{route('profile')}}"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-8 rounded-lg shadow-md transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50">
+                        Cancel
+                    </a>
                         <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-8 rounded-lg shadow-md transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50">
                             Complete Profile
                         </button>

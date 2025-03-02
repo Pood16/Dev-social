@@ -23,11 +23,11 @@
                 </button>
              </div>
              <div class="flex-shrink-0">
-                <button type="button" class="relative inline-flex items-center p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
+                <a href="{{route('mark-as-read')}}" class="relative inline-flex items-center p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
                    <span class="sr-only">Notifications</span>
                    <i class="fas fa-bell"></i>
-                   <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-amber-500"></span>
-                </button>
+                   <span class="absolute top-0 right-0">{{auth()->user()->notifications->count()}}</span>
+                </a>
              </div>
              <div class="ml-3 relative">
                 <div>

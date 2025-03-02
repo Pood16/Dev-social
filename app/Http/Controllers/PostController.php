@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Hashtag;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Notifications\LikeNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,7 @@ class PostController extends Controller
 
     public function index()
     {
-        $posts = Post::with(['user', 'comments', 'likes'])->latest()->limit(10)->get();
+        $posts = Post::with(['user', 'comments', 'likes'])->latest()->get();
         return view('index', compact('posts'));
     }
 
@@ -81,12 +82,10 @@ class PostController extends Controller
             $post->hashtags()->sync($hashtags);
         }
 
-        return redirect()->route('feeds')->with('uccess', 'Post created successfully');
+        return redirect()->route('feeds')->with('success', 'Post created successfully');
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Post $post)
     {
         if ($post->user_id !== Auth::id()) {
@@ -95,17 +94,13 @@ class PostController extends Controller
         return view('post.show', compact('post'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(Post $post)
     {
         return view('posts.edit', compact('post'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, Post $post)
 {
     if ($post->user_id !== Auth::id()) {
@@ -131,11 +126,9 @@ class PostController extends Controller
     $post->update($validated);
 
     return redirect()->route('feeds')->with('success', 'Post updated successfully');
-}
+    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Post $post)
     {
         if ($post->user_id !== Auth::id()) {
@@ -152,20 +145,6 @@ class PostController extends Controller
         return redirect()->route('feeds')->with('success', 'Post deleted successfully');
     }
 
-    /**
-     * Like the specified post.
-     */
-    // public function like(Post $post)
-    // {
-    //     $post->likes()->create([
-    //         'user_id' => Auth::id()
-    //     ]);
-    //     return redirect()->back()->with('success', 'Post liked successfully');
-    // }
-
-    /**
-     * Comment on the specified post.
-     */
     public function comment(Request $request, Post $post)
     {
         $request->validate([
@@ -180,9 +159,7 @@ class PostController extends Controller
         return redirect()->back()->with('success', 'Comment added successfully');
     }
 
-    /**
-     * Filter posts by hashtag.
-     */
+    //Filter posts by hashtag.
     public function filterByHashtag($hashtag)
     {
         $posts = Hashtag::where('name', $hashtag)->firstOrFail()->posts()->paginate(10);
@@ -190,8 +167,8 @@ class PostController extends Controller
     }
 
 
-    public function toggleLike(Post $post)
-    {
+    public function toggleLike(Post $post){
+
         $like = $post->likes()->where('user_id', Auth::id())->first();
 
         if ($like) {
@@ -202,6 +179,7 @@ class PostController extends Controller
                 'user_id' => Auth::id()
             ]);
             $isLiked = true;
+            $post->user->notify(new LikeNotification($post));
         }
 
         return response()->json([
@@ -211,11 +189,23 @@ class PostController extends Controller
         ]);
     }
 
-    public function checkLike(Post $post)
-    {
+    public function checkLike(Post $post){
         return response()->json([
             'isLiked' => $post->likes()->where('user_id', Auth::id())->exists()
         ]);
     }
+
+    // notifications : mark unread notifications as read
+    public function markAsRead(){
+        $user = Auth::user();
+        $user->unreadNotifications->markAsRead();
+        // // dd($user->unreadNotifications);
+        // foreach ($user->unreadNotifications as $notification) {
+        //     $notification->markAsRead();
+        // }
+        return redirect()->back();
+    }
+
+
 
 }
