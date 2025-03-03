@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
@@ -43,12 +44,25 @@ Route::group(['prefix'=> 'project'], function () {
 
 // notifications routes
 Route::get('/mark-as-read', [PostController::class,'markAsRead'])->name('mark-as-read');
+Route::get('/test', [HomeController::class,'index'])->name('homeTest');
 
 
 
 Route::get('/index', function () {
     return view('index');
 })->middleware(['auth', 'verified'])->name('index');
+
+// connection routes
+Route::controller(ConnectionController::class)->middleware('auth')->group(function () {
+    Route::post('/post/connections/send/{user}', 'sendRequest')->name('request.send');
+    Route::get('/post/connections/status/{user}', 'checkConnectionStatus')->name('request.status');
+    Route::get('/connections/accepted', 'getAcceptedConnections')->name('connections.accepted');
+    Route::get('/connections', 'getAllConnections')->name('connections');
+    Route::post('/connections/accept/{connection}', 'acceptRequest')->name('connections.accept');
+    Route::post('/connections/reject/{connection}', 'rejectRequest')->name('connections.reject');
+    Route::delete('/connections/destroy/{connection}', 'removeConnection')->name('connections.destroy');
+});
+
 
 
 require __DIR__.'/auth.php';

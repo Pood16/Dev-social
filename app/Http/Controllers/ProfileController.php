@@ -20,7 +20,7 @@ class ProfileController extends Controller
     // update the profile section
     public function showEditProfile(){
         $user = User::where("id",Auth::user()->id)->first();
-        return view("profile.complete", compact("user"));
+        return view("profile.edit", compact("user"));
     }
     // submit the profile updates
     public function updateProfile(Request $request){

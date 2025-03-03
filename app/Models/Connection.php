@@ -21,5 +21,9 @@ class Connection extends Model
     public function receiver() {
         return $this->belongsTo(User::class, 'receiver_id');
     }
+
+    public function user() {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
 

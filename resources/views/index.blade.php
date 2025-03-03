@@ -30,12 +30,14 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
+                       <!-- filepath: /c:/laravel_Projects/dev-social/resources/views/index.blade.php -->
                         @else
-                            <button onclick="connectWithUser({{ $post->user_id }})"
-                                class="text-gray-400 hover:text-amber-600 transition-colors flex items-center space-x-1">
-                                <i class="fas fa-user-plus"></i>
-                                <span class="text-sm">Connect</span>
-                            </button>
+                        <button onclick="sendConnectionRequest({{ $post->user->id }})"
+                            class="text-gray-400 hover:text-amber-600 transition-colors flex items-center space-x-1 connect-button"
+                            data-user-id="{{ $post->user->id }}">
+                            <i class="fas fa-user-plus"></i>
+                            <span class="text-sm">Connect</span>
+                        </button>
                         @endif
                     </div>
                 </div>
@@ -533,6 +535,104 @@ async function toggleLike(postId) {
                 console.error('Error checking like status:', error);
             }
         }
+
+        // send connection request
+        async function sendConnectionRequest(userId) {
+            try {
+                const token = document.querySelector('meta[name="csrf-token"]')?.content;
+                if (!token) {
+                    throw new Error('CSRF token not found');
+                }
+
+                const response = await fetch(`/post/connections/send/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                console.log(data);
+
+
+                if (data.success) {
+
+                    const button = document.querySelector(`.connect-button[data-user-id="${userId}"]`);
+
+                    if (button) {
+                        button.innerHTML = `
+                            <i class="fas fa-clock"></i>
+                            <span class="text-sm">Pending</span>
+                        `;
+                        button.disabled = true;
+                        button.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            } catch (error) {
+                console.error('Error sending connection request:', error);
+                alert('Failed to send connection request. Please try again.');
+            }
+        }
+
+        // check initial connection status
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.connect-button').forEach(button => {
+                const userId = button.dataset.userId;
+                // console.log(userId);
+                checkConnectionStatus(userId);
+            });
+        });
+
+        async function checkConnectionStatus(userId) {
+            try {
+                const token = document.querySelector('meta[name="csrf-token"]')?.content;
+                if (!token) {
+                    throw new Error('CSRF token not found');
+                }
+
+                const response = await fetch(`/post/connections/status/${userId}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                const button = document.querySelector(`.connect-button[data-user-id="${userId}"]`);
+
+                if (button && data.status) {
+                    switch (data.status) {
+                        case 'pending':
+                            button.innerHTML = `
+                                <i class="fas fa-clock"></i>
+                                <span class="text-sm">Pending</span>
+                            `;
+                            button.disabled = true;
+                            button.classList.add('opacity-50', 'cursor-not-allowed');
+                            break;
+                        case 'accepted':
+                            button.innerHTML = `
+                                <i class="fas fa-user-check"></i>
+                                <span class="text-sm">Connected</span>
+                            `;
+                            button.disabled = true;
+                            button.classList.add('opacity-70', 'cursor-not-allowed');
+                            break;
+                        case 'rejected':
+                            button.innerHTML = `
+                                <i class="fas fa-user-plus"></i>
+                                <span class="text-sm">Connect</span>
+                            `;
+                            break;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking connection status:', error);
+            }
+}
 
 </script>
 </x-app-layout>

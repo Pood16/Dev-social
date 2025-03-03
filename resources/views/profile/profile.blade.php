@@ -237,16 +237,14 @@
             <!-- Connections -->
             <div class="bg-white shadow rounded-lg p-6">
                 <div class="flex justify-between items-center mb-4">
-                  <h2 class="text-lg font-medium text-gray-900">Connections</h2>
-                  <a href="#" class="text-sm text-amber-600 hover:text-amber-700">See all</a>
+                    <h2 class="text-lg font-medium text-gray-900">Connections</h2>
+                    {{-- <a href="#" class="text-sm text-amber-600 hover:text-amber-700">See all</a> --}}
                 </div>
-                <div class="grid grid-cols-3 gap-4 min-w-1/3">
-                  <div class="text-center">
-                    <div class="relative group">
-                      <img class="h-16 w-16 rounded-full mx-auto object-cover" src="{{Storage::url($user->profile_picture)}}" alt="Connection 1">
+                <div id="connections-container" class="grid grid-cols-3 gap-4 min-w-1/3">
+                    <!-- Connections -->
+                    <div class="flex items-center justify-center">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
                     </div>
-                    <p class="mt-2 text-xs text-gray-500">{{$user->name}}</p>
-                  </div>
                 </div>
             </div>
           </div>
@@ -263,6 +261,7 @@
         function closeSkillModal() {
             document.getElementById('skillModal').classList.add('hidden');
         }
+
         // projects modal
         function openProjectModal() {
             document.getElementById('projectModal').classList.remove('hidden');
@@ -270,6 +269,74 @@
 
         function closeProjectModal() {
             document.getElementById('projectModal').classList.add('hidden');
+        }
+
+        // Load connections
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConnections();
+        });
+
+        async function loadConnections() {
+            try {
+
+                const response = await fetch('/connections/accepted', {
+
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+
+                if (data.success) {
+                    const container = document.getElementById('connections-container');
+
+                    if (data.connections.length === 0) {
+                        container.innerHTML = `
+                            <div class="col-span-3 text-center text-gray-500">
+                                No connections yet
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = data.connections.map(connection => {
+                        const connectionUser = connection.sender_id === {{ Auth::id() }}
+                            ? connection.receiver
+                            : connection.sender;
+
+                        return `
+                            <div class="text-center">
+                                <div class="relative group">
+                                    <img class="h-16 w-16 rounded-full mx-auto object-cover"
+                                        src="${connectionUser.profile_picture
+                                            ? '/storage/' + connectionUser.profile_picture
+                                            : '/images/default-avatar.png'}"
+                                        alt="${connectionUser.name}">
+                                </div>
+                                <p class="mt-2 text-xs text-gray-500">${connectionUser.name}</p>
+                                <a href="/profile/${connectionUser.id}"
+                                    class="text-xs text-amber-600 hover:text-amber-700">
+                                    View Profile
+                                </a>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('Error loading connections:', error);
+                document.getElementById('connections-container').innerHTML = `
+                    <div class="col-span-3 text-center text-red-500">
+                        Failed to load connections
+                    </div>
+                `;
+            }
         }
     </script>
   </x-app-layout>

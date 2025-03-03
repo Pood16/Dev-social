@@ -121,16 +121,38 @@ class User extends Authenticatable
     }
 
     public function sentConnections(){
-        return $this->hasMany(Connection::class, 'sender_id');
+        return $this->hasMany(Connection::class, 'user_id');
     }
 
     public function receivedConnections(){
-        return $this->hasMany(Connection::class, 'receiver_id');
+        return $this->hasMany(Connection::class, 'follower_id');
     }
 
     public function connections() {
-        return $this->sentConnections()->where('status', 'accepted')->union($this->receivedConnections()->where('status', 'accepted'));
+        return $this->hasMany(Connection::class);
     }
 
-    
+
+    // Helper method to get all connections
+    public function getAllConnections() {
+        return Connection::where('sender_id', $this->id)
+            ->orWhere('receiver_id', $this->id)
+            ->where('status', 'accepted');
+    }
+
+    // Helper method to check if connected with another user
+    public function isConnectedWith(User $user) {
+        return Connection::where(function($query) use ($user) {
+                $query->where('sender_id', $this->id)
+                      ->where('receiver_id', $user->id);
+            })
+            ->orWhere(function($query) use ($user) {
+                $query->where('sender_id', $user->id)
+                      ->where('receiver_id', $this->id);
+            })
+            ->where('status', 'accepted')
+            ->exists();
+    }
+
+
 }
