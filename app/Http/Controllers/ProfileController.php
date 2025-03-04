@@ -42,6 +42,7 @@ class ProfileController extends Controller
     // cover and profile image update
     public function updateCover(Request $request){
         // $user = User::where("id",Auth::user()->id)->first();
+
         $imagepath = $request->file('cover_image') ? $request->file('cover_image')->store('profile-covers', 'public') : null;
         $request->user()->cover_picture = $imagepath;
         $request->user()->save();
