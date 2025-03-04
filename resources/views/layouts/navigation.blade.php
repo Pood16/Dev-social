@@ -12,13 +12,23 @@
                 <a href="{{route('connections')}}" class="{{request()->routeIs('connections') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"> Connections </a>
                 <a href="{{route('profile')}}" class="{{request()->routeIs('profile') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"> Profile </a>
                 {{-- <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"> Jobs </a> --}}
-             </div>
+            </div>
           </div>
+          {{-- search icon --}}
+            <div class="hidden sm:ml-6 sm:flex items-center sm:space-x-8">
+                <div class="flex items-center">
+                    <input type="text" placeholder="Search" class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    <button class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-md ml-2 cursor-pointer">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+          {{-- end search icon --}}
           <div class="flex items-center">
             <div class="flex-shrink-0 mr-4">
                 <!-- Add Post Button -->
                 <button type="button" onclick="openPostModal()"
-                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 cursor-pointer">
                    <i class="fas fa-plus mr-2"></i> Create Post
                 </button>
              </div>
@@ -61,7 +71,7 @@
           </div>
        </div>
     </div>
- </nav>
+</nav>
 
 <!-- Add this script at the end of your navigation file -->
 <script>

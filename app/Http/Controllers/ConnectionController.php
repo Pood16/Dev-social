@@ -72,7 +72,7 @@ class ConnectionController extends Controller
             ], 403);
         }
 
-        $connection->update(['status' => 'rejected']);
+        $connection->delete();
 
         return response()->json([
             'success' => true,

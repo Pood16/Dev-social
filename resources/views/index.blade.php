@@ -106,7 +106,7 @@
                                     class="h-8 w-8 rounded-full object-cover">
                                 <div class="flex-1">
                                     <textarea name="content" rows="2"
-                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
+                                        class="p-1 w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
                                         placeholder="Write a comment..."></textarea>
                                 </div>
                                 <button id="submit-comment" type="submit"
