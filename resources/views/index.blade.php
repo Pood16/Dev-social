@@ -480,13 +480,13 @@ function deleteComment(commentId) {
 }
 
 // likes
-document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.like-button').forEach(button => {
                 const postId = button.dataset.postId;
                 checkLikeStatus(postId);
             });
         });
-async function toggleLike(postId) {
+        async function toggleLike(postId) {
             try {
                 const response = await fetch(`/post/${postId}/like`, {
                     method: 'POST',
@@ -497,6 +497,8 @@ async function toggleLike(postId) {
                 });
 
                 const data = await response.json();
+                
+                console.log(data);
 
 
                 if (data.success) {

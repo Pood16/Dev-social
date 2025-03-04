@@ -11,6 +11,7 @@ class ConnectionController extends Controller
 {
     // send connection request
     public function sendRequest(User $user){
+
         // Check the connection
         $existingConnection = Connection::where(function($query) use ($user) {
                 $query->where('sender_id', Auth::id())
@@ -43,8 +44,7 @@ class ConnectionController extends Controller
     }
 
     // accept connection request
-    public function acceptRequest(Connection $connection)
-    {
+    public function acceptRequest(Connection $connection){
 
         if ($connection->receiver_id !== Auth::id()) {
             return response()->json([

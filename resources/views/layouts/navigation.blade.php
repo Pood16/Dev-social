@@ -14,7 +14,7 @@
                 {{-- <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"> Jobs </a> --}}
             </div>
           </div>
-          {{-- search icon --}}
+        <!-- search icon -->
             <div class="hidden sm:ml-6 sm:flex items-center sm:space-x-8">
                 <div class="flex items-center">
                     <input type="text" placeholder="Search" class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
@@ -23,23 +23,74 @@
                     </button>
                 </div>
             </div>
-          {{-- end search icon --}}
-          <div class="flex items-center">
+        <!-- right side -->
+        <div class="flex items-center">
+            <!-- Post Button -->
             <div class="flex-shrink-0 mr-4">
-                <!-- Add Post Button -->
                 <button type="button" onclick="openPostModal()"
                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 cursor-pointer">
                    <i class="fas fa-plus mr-2"></i> Create Post
                 </button>
-             </div>
-             <div class="flex-shrink-0">
-                <a href="{{route('mark-as-read')}}" class="relative inline-flex items-center p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
-                   <span class="sr-only">Notifications</span>
-                   <i class="fas fa-bell"></i>
-                   <span class="absolute top-0 right-0">{{auth()->user()->notifications->count()}}</span>
-                </a>
-             </div>
-             <div class="ml-3 relative">
+            </div>
+
+            <!-- notifications -->
+            <div class="ml-3 relative">
+                <div>
+                    <button type="button"
+                        onclick="toggleNotificationsDropdown()"
+                        class="cursor-pointer max-w-xs bg-white flex items-center text-sm rounded-full"
+                        id="notification-menu-button">
+                        <span class="sr-only">Open notifications</span>
+                        <div class="relative p-1">
+                            <i class="fas fa-bell text-gray-600"></i>
+                            <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                {{auth()->user()->unreadNotifications->count()}}
+                            </span>
+                        </div>
+                    </button>
+                </div>
+                <!-- Notifications dropdown menu -->
+                <div id="notifications-dropdown"
+                    class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="notification-menu-button">
+
+                    <div class="px-4 py-2 border-b border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-medium text-gray-700">Notifications</h3>
+                            <span class="text-xs text-gray-500">{{auth()->user()->unreadNotifications->count()}} new</span>
+                        </div>
+                    </div>
+
+                    <div class="max-h-72 overflow-y-auto">
+                        @if(auth()->user()->notifications->count() > 0)
+                            @foreach(auth()->user()->notifications as $notification)
+                                <div class="py-2 px-4 border-b border-gray-50 hover:bg-gray-50">
+                                    <p class="text-sm text-gray-800"> <span>{{$notification->data['user_name'] ?? ''}}</span> {{ $notification->data['message'] ?? 'New notification' }}</p>
+                                    <p class="mt-1 text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="py-4 text-center text-gray-500 text-sm">
+                                No new notifications
+                            </div>
+                        @endif
+                    </div>
+
+                    @if(auth()->user()->unreadNotifications->count() > 0)
+                        <form method="POST" action="{{ route('mark-as-read') }}">
+                            @csrf
+                            <button type="submit"
+                                class="cursor-pointer block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-100"
+                                role="menuitem">
+                                Mark all as read
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+            <div class="ml-3 relative">
                 <div>
                     <button type="button"
                         onclick="toggleDropdown()"
@@ -73,19 +124,38 @@
     </div>
 </nav>
 
-<!-- Add this script at the end of your navigation file -->
+
 <script>
+
+
+    // logout dropdown
     function toggleDropdown() {
         const dropdown = document.getElementById('dropdown-menu');
         dropdown.classList.toggle('hidden');
     }
 
-    // Close dropdown when clicking outside
+    // notifications list
+    function toggleNotificationsDropdown() {
+        const dropdown = document.getElementById('notifications-dropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
+    // Close dropdowns
     window.addEventListener('click', function(e) {
-        const dropdown = document.getElementById('dropdown-menu');
-        const button = document.getElementById('user-menu-button');
-        if (!button.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.add('hidden');
+
+        // User dropdown
+        const userDropdown = document.getElementById('dropdown-menu');
+        const userButton = document.getElementById('user-menu-button');
+        if (!userButton.contains(e.target) && !userDropdown.contains(e.target)) {
+            userDropdown.classList.add('hidden');
+        }
+
+        // Notifications dropdown
+        const notifDropdown = document.getElementById('notifications-dropdown');
+        const notifButton = document.getElementById('notification-menu-button');
+        if (notifDropdown && notifButton && !notifButton.contains(e.target) && !notifDropdown.contains(e.target)) {
+            notifDropdown.classList.add('hidden');
         }
     });
+
 </script>

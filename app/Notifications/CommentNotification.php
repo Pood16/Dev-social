@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 
-class LikeNotification extends Notification
+class CommentNotification extends Notification
 {
     use Queueable;
     protected $post;
@@ -22,11 +22,6 @@ class LikeNotification extends Notification
     }
 
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
         return ['database'];
@@ -52,9 +47,9 @@ class LikeNotification extends Notification
     {
         return [
             'user_name' => Auth::user()->name,
-            'message' => 'Liked your post',
+            'message' => 'Has commented on your post',
             'post_title' => $this->post->title,
-            'type' => 'like'
+            'type' => 'comment'
         ];
     }
 }

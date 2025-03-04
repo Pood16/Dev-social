@@ -28,21 +28,12 @@ class User extends Authenticatable
         'portfolio',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -75,8 +66,7 @@ class User extends Authenticatable
     }
 
 
-    public function toggleLikeDislike($postId, $like)
-    {
+    public function toggleLikeDislike($postId, $like){
         // Check if the like/dislike already exists
         $existingLike = $this->likes()->where('post_id', $postId)->first();
 
@@ -133,14 +123,14 @@ class User extends Authenticatable
     }
 
 
-    // Helper method to get all connections
+
     public function getAllConnections() {
         return Connection::where('sender_id', $this->id)
             ->orWhere('receiver_id', $this->id)
             ->where('status', 'accepted');
     }
 
-    // Helper method to check if connected with another user
+
     public function isConnectedWith(User $user) {
         return Connection::where(function($query) use ($user) {
                 $query->where('sender_id', $this->id)
