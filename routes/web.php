@@ -64,6 +64,9 @@ Route::controller(ConnectionController::class)->middleware('auth')->group(functi
     Route::delete('/connections/destroy/{connection}', 'removeConnection')->name('connections.destroy');
 });
 
+Route::view('pusher1', 'pusher1');
+Route::view('pusher2', 'pusher2');
+
 
 
 require __DIR__.'/auth.php';

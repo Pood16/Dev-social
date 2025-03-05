@@ -394,6 +394,7 @@
             })
             .then(data => {
                 if (data.success) {
+
                     const commentsList = form.closest('.mt-6')?.querySelector('.space-y-4');
                     if (!commentsList) {
                         throw new Error('Comments list container not found');
@@ -437,7 +438,7 @@
 
 // delete comment
 
-function deleteComment(commentId) {
+        function deleteComment(commentId) {
 
     if (!confirm('Are you sure you want to delete this comment?')) {
         return;
@@ -465,6 +466,7 @@ function deleteComment(commentId) {
     })
     .then(data => {
         if (data.success) {
+
             const commentElement = document.querySelector(`#comment-${commentId}`);
             if (commentElement) {
                 commentElement.remove();
@@ -497,7 +499,7 @@ function deleteComment(commentId) {
                 });
 
                 const data = await response.json();
-                
+
                 console.log(data);
 
 

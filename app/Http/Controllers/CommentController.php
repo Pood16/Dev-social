@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PostCommented;
+use App\Events\TestNotification;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Notifications\CommentNotification;
@@ -23,6 +25,16 @@ class CommentController extends Controller
             'user_id' => Auth::id(),
         ]);
         $post->user->notify(new CommentNotification($post));
+        // event(new PostCommented([
+        //     'author' => $post->comments->last()->user->name,
+        //     'message' => 'commented on your post',
+        //     'content' => $post->title,
+        // ]));
+
+        $postOwner = $post->user->id;
+
+        // Fire event to notify the post owner
+        // event(new PostCommented($comment));
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -34,6 +46,7 @@ class CommentController extends Controller
                         'name' => Auth::user()->name,
                         'profile_picture' => Auth::user()->profile_picture
                     ],
+                    'post_owner' => $postOwner
                 ]
             ]);
         }

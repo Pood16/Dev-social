@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TestNotification;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Hashtag;
@@ -75,6 +76,12 @@ class PostController extends Controller
             'links' => $request->links,
             'hashtags' => implode(',', $hashtagArray ?? [])
         ]);
+
+          // Dispatch the event with the post data
+        event(new TestNotification([
+            'author' => $post->user->name,
+            'title' => $post->title,
+        ]));
 
 
         // Attach hashtags to the post

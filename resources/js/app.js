@@ -26,3 +26,5 @@ tailwind.config = {
         }
     }
 }
+
+
