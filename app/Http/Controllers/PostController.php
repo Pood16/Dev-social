@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PostLiked;
 use App\Events\TestNotification;
 use App\Models\Post;
 use App\Models\User;
@@ -187,6 +188,10 @@ class PostController extends Controller
             ]);
             $isLiked = true;
             $post->user->notify(new LikeNotification($post));
+            event(new PostLiked([
+                'actor' => Auth::user()->name,
+                'post' => $post->title,
+            ]));
         }
 
         return response()->json([

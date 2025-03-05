@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PostCommented  implements ShouldBroadcastNow
+class PostLiked implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -24,12 +24,12 @@ class PostCommented  implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new Channel('comment-channel');
+        return new Channel('like-channel');
     }
 
     public function broadcastAs()
     {
-        return 'comment.notification';
+        return 'like.notification';
     }
 
     public function broadcastWith(): array
