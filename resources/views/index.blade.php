@@ -141,7 +141,6 @@
 <!-- script -->
 <script>
 
-
     // Post Modal
     function openPostModal() {
         document.getElementById('postModal').classList.remove('hidden');
@@ -302,95 +301,93 @@
         }
     }
 
-// delete comment
+    /*
+    ****** delete a comment
+    */
 
-        function deleteComment(commentId) {
-
-    if (!confirm('Are you sure you want to delete this comment?')) {
-        return;
-    }
-
-    const token = document.querySelector('meta[name="csrf-token"]')?.content;
-    if (!token) {
-        throw new Error('CSRF token not found');
-    }
-
-    fetch(`/post/comments/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token,
-            'Accept': 'application/json'
-        },
-    })
-    .then(async response => {
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    function deleteComment(commentId) {
+        if (!confirm('Are you sure you want to delete this comment?')) {
+            return;
         }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-
-            const commentElement = document.querySelector(`#comment-${commentId}`);
-            if (commentElement) {
-                commentElement.remove();
-            }else{
-                alert('lahcen ouirghane');
+        const token = document.querySelector('meta[name="csrf-token"]')?.content;
+        if (!token) {
+            throw new Error('CSRF token not found');
+        }
+        fetch(`/post/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            },
+        }).then(async response => {
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
             }
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to delete comment. Please try again.');
-    });
-}
-
-// likes
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.like-button').forEach(button => {
-                const postId = button.dataset.postId;
-                checkLikeStatus(postId);
-            });
-        });
-        async function toggleLike(postId) {
-            try {
-                const response = await fetch(`/post/${postId}/like`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                console.log(data);
-
-
-                if (data.success) {
-                    const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
-                    const icon = button.querySelector('.like-icon');
-                    const count = button.querySelector('.likes-count');
-
-                    // Update like count
-                    count.textContent = data.likesCount;
-
-                    // Update icon state
-                    if (data.isLiked) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas', 'text-red-600');
-                    } else {
-                        icon.classList.remove('fas', 'text-red-600');
-                        icon.classList.add('far');
-                    }
+            return response.json();
+        }).then(data => {
+            if (data.success) {
+                const commentElement = document.querySelector(`#comment-${commentId}`);
+                if (commentElement) {
+                    commentElement.remove();
+                }else{
+                    alert('lahcen ouirghane');
                 }
-            } catch (error) {
-                console.error('Error toggling like:', error);
             }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete comment. Please try again.');
+        });
+    }
+
+    /*
+    ****** Like a post
+    */
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.like-button').forEach(button => {
+            const postId = button.dataset.postId;
+            checkLikeStatus(postId);
+        });
+    });
+    async function toggleLike(postId) {
+        try {
+            const response = await fetch(`/post/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            console.log(data);
+
+
+            if (data.success) {
+                const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
+                const icon = button.querySelector('.like-icon');
+                const count = button.querySelector('.likes-count');
+
+                // Update like count
+                count.textContent = data.likesCount;
+
+                // Update icon state
+                if (data.isLiked) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas', 'text-red-600');
+                } else {
+                    icon.classList.remove('fas', 'text-red-600');
+                    icon.classList.add('far');
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
         }
-        async function checkLikeStatus(postId) {
+    }
+
+    async function checkLikeStatus(postId) {
             try {
                 const response = await fetch(`/post/${postId}/check-like`);
                 const data = await response.json();
@@ -406,8 +403,10 @@
             }
         }
 
-        // send connection request
-        async function sendConnectionRequest(userId) {
+    /*
+    ****** Send connection request
+    */t
+    async function sendConnectionRequest(userId) {
             try {
                 const token = document.querySelector('meta[name="csrf-token"]')?.content;
                 if (!token) {
@@ -446,16 +445,17 @@
             }
         }
 
-        // check initial connection status
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.connect-button').forEach(button => {
-                const userId = button.dataset.userId;
-                // console.log(userId);
-                checkConnectionStatus(userId);
-            });
+    /*
+    ****** check connection status
+    */
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.connect-button').forEach(button => {
+            const userId = button.dataset.userId;
+            checkConnectionStatus(userId);
         });
+    });
 
-        async function checkConnectionStatus(userId) {
+    async function checkConnectionStatus(userId) {
             try {
                 const token = document.querySelector('meta[name="csrf-token"]')?.content;
                 if (!token) {
