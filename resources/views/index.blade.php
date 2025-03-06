@@ -213,6 +213,7 @@
 
         try {
             const form = document.getElementById(`commentForm-${postId}`);
+            const auth_user = document.querySelector('meta[name="user-id"]').content;
             if (!form) {
                 throw new Error('Comment form not found');
             }
@@ -241,7 +242,7 @@
                     'X-CSRF-TOKEN': token,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ comment: content })
+                body: JSON.stringify({ comment: content, user_id: auth_user})
             })
             .then(async response => {
                 if (!response.ok) {
@@ -252,7 +253,7 @@
             })
             .then(data => {
                 if (data.success) {
-                  
+
 
                     const commentsList = form.closest('.mt-6')?.querySelector('.space-y-4');
                     if (!commentsList) {

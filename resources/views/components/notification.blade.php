@@ -96,7 +96,7 @@
             }
 
             notificationEl.innerHTML = `
-                <p class="text-sm text-gray-900">${notification.data.message}</p>
+                <p class="text-sm text-gray-900">${notification.data.user_name}  ${notification.data.message}</p>
                 <p class="text-xs text-gray-500 mt-1">${formatDate(notification.created_at)}</p>
             `;
 

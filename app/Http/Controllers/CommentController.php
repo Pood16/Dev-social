@@ -7,6 +7,7 @@ use App\Events\PostCommented;
 use App\Events\TestNotification;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\User;
 use App\Notifications\CommentNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,10 +17,12 @@ class CommentController extends Controller
     public function store(Request $request, $id )
     {
 
+
         $validated = $request->validate([
             'comment' => 'required|string|max:1000',
         ]);
         $post = Post::findOrFail($id);
+        $user = User::findOrFail($request->user_id);
 
         $comment = $post->comments()->create([
             'comment' => $validated['comment'],
@@ -32,7 +35,7 @@ class CommentController extends Controller
         event(new PostCommented([
             'state' => true,
             'author' => $post->comments->last()->user->name,
-            'message' => 'commented on your post',
+            'message' => $user->name.' '. 'commented on your post',
             'content' => $post->title,
             'post_owner_id' => $post->user->id
         ]));
