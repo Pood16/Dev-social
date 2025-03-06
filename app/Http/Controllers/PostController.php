@@ -187,11 +187,19 @@ class PostController extends Controller
                 'user_id' => Auth::id()
             ]);
             $isLiked = true;
-            $post->user->notify(new LikeNotification($post));
+
+            if($post->user != Auth::user()){
+
+                $post->user->notify(new LikeNotification($post));
+
+            }
+
             event(new PostLiked([
                 'actor' => Auth::user()->name,
                 'post' => $post->title,
+                'author' => $post->user_id,
             ]));
+
         }
 
         return response()->json([

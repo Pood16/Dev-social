@@ -25,11 +25,16 @@ class CommentController extends Controller
             'comment' => $validated['comment'],
             'user_id' => Auth::id(),
         ]);
-        $post->user->notify(new CommentNotification($post));
+        if($post->user != Auth::user()){
+            $post->user->notify(new CommentNotification($post));
+        }
+        // $post->user->notify(new CommentNotification($post));
         event(new PostCommented([
+            'state' => true,
             'author' => $post->comments->last()->user->name,
             'message' => 'commented on your post',
             'content' => $post->title,
+            'post_owner_id' => $post->user->id
         ]));
 
         $postOwner = $post->user->id;

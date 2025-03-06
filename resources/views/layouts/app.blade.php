@@ -33,6 +33,8 @@
             }
         </style>
         <script>
+            const auth_user = document.querySelector('meta[name="user-id"]').content;
+            // console.log(typeof auth_user);
             Pusher.logToConsole = true;
             var pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
                 cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
@@ -44,29 +46,34 @@
             // Listen for events
             // comment event
             comment_Channel.bind('comment.notification', function(data) {
-                if (data.author && data.content) {
-                    toastr.info(
-                        `<div class="notification-content">
-                            <i class="fas fa-user"></i> <span>${data.author}</span>
-                            <i class="fas fa-book" style="margin-left: 20px;"></i> <span>${data.content}</span>
-                        </div>`,
-                        'New Comment on your post',
-                        {
-                            closeButton: true,
-                            progressBar: true,
-                            timeOut: 0,
-                            extendedTimeOut: 0,
-                            positionClass: 'toast-top-right',
-                            enableHtml: true
+
+                // console.log(typeof data.post_owner_id);
+                        if (data.state) {
+                            if (parseInt(auth_user) === parseInt(data.post_owner_id)) {
+                                toastr.info(
+                                    `<div class="notification-content">
+                                        <i class="fas fa-user"></i> <span>${data.author}</span>
+                                        <i class="fas fa-book" style="margin-left: 20px;"></i> <span>${data.content}</span>
+                                    </div>`,
+                                    'New Comment on your post',
+                                    {
+                                        closeButton: true,
+                                        progressBar: true,
+                                        timeOut: 0,
+                                        extendedTimeOut: 0,
+                                        positionClass: 'toast-top-right',
+                                        enableHtml: true
+                                    }
+                                );
+                            }
                         }
-                    );
-                } else {
-                    console.error('Invalid data received:', data);
-                }
-            });
-            //like event
-            like_Channel.bind('like.notification', function(data) {
-                if (data.actor && data.post) {
+                });
+
+
+                //like event
+                like_Channel.bind('like.notification', function(data) {
+                    if (data.actor && data.post) {
+
                     toastr.info(
                         `<div class="notification-content">
                             <i class="fas fa-book" style="margin-left: 20px;"></i> <span>${data.post} By</span>
