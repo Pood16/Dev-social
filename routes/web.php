@@ -6,8 +6,8 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -67,6 +67,7 @@ Route::controller(ConnectionController::class)->middleware('auth')->group(functi
 
 Route::view('pusher1', 'pusher1');
 Route::view('pusher2', 'pusher2');
+Route::get('/search/hashtags', [SearchController::class, 'searchHashtags'])->middleware('auth')->name('search.hashtags');
 
 
 

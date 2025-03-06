@@ -11,7 +11,7 @@
 
     <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 transition-all duration-100">
         <div class="max-h-96 overflow-y-auto" id="notification-list">
-        {{-- notifications here --}}
+        <!-- notifications here -->
         </div>
 
         <div id="mark-all-container" class="hidden border-t border-gray-100 mt-2">

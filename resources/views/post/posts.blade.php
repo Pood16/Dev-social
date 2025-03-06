@@ -68,12 +68,13 @@
 
                         <!-- Hashtags -->
                         @if($post->hashtags)
-                            <div class="flex flex-wrap gap-2 mt-3">
+                            <div class="flex flex-wrap gap-2 mb-4">
                                 @foreach(explode(',', $post->hashtags) as $tag)
-                                    <a href="#"
-                                        class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm hover:bg-amber-200">
-                                        #{{ trim($tag) }}
-                                    </a>
+                                    @php $tag = trim($tag);@endphp
+                                        <a href="{{ route('search.hashtags', ['query' => $tag]) }}"
+                                            class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm hover:bg-amber-200">
+                                            #{{ $tag }}
+                                        </a>
                                 @endforeach
                             </div>
                         @endif

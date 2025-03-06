@@ -15,14 +15,16 @@
             </div>
           </div>
         <!-- search icon -->
-            <div class="hidden sm:ml-6 sm:flex items-center sm:space-x-8">
-                <div class="flex items-center">
-                    <input type="text" placeholder="Search" class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
-                    <button class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-md ml-2 cursor-pointer">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
+        <div class="hidden sm:ml-6 sm:flex items-center sm:space-x-8">
+            <form action="{{ route('search.hashtags') }}" method="GET" class="flex items-center">
+                <input type="text" name="query" placeholder="Search hashtags"
+                       class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                       value="{{ request()->query('query') }}">
+                <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-md ml-2 cursor-pointer">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
         <!-- right side -->
         <div class="flex items-center">
             <!-- Post Button -->
