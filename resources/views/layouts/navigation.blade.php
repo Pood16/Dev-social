@@ -34,62 +34,10 @@
             </div>
 
             <!-- notifications -->
-            <div class="ml-3 relative">
-                <div>
-                    <button type="button"
-                        onclick="toggleNotificationsDropdown()"
-                        class="cursor-pointer max-w-xs bg-white flex items-center text-sm rounded-full"
-                        id="notification-menu-button">
-                        <span class="sr-only">Open notifications</span>
-                        <div class="relative p-1">
-                            <i class="fas fa-bell text-gray-600"></i>
-                            <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                                {{auth()->user()->unreadNotifications->count()}}
-                            </span>
-                        </div>
-                    </button>
-                </div>
-                <!-- Notifications dropdown menu -->
-                <div id="notifications-dropdown"
-                    class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="notification-menu-button">
 
-                    <div class="px-4 py-2 border-b border-gray-200">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-medium text-gray-700">Notifications</h3>
-                            <span class="text-xs text-gray-500">{{auth()->user()->unreadNotifications->count()}} new</span>
-                        </div>
-                    </div>
+            <x-notification/>
 
-                    <div class="max-h-72 overflow-y-auto">
-                        @if(auth()->user()->notifications->count() > 0)
-                            @foreach(auth()->user()->notifications as $notification)
-                                <div class="py-2 px-4 border-b border-gray-50 hover:bg-gray-50">
-                                    <p class="text-sm text-gray-800"> <span>{{$notification->data['user_name'] ?? ''}}</span> {{ $notification->data['message'] ?? 'New notification' }}</p>
-                                    <p class="mt-1 text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="py-4 text-center text-gray-500 text-sm">
-                                No new notifications
-                            </div>
-                        @endif
-                    </div>
-
-                    @if(auth()->user()->unreadNotifications->count() > 0)
-                        <form method="POST" action="{{ route('mark-as-read') }}">
-                            @csrf
-                            <button type="submit"
-                                class="cursor-pointer block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-100"
-                                role="menuitem">
-                                Mark all as read
-                            </button>
-                        </form>
-                    @endif
-                </div>
-            </div>
+            <!-- end -->
             <div class="ml-3 relative">
                 <div>
                     <button type="button"

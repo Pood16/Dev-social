@@ -47,9 +47,14 @@
             // comment event
             comment_Channel.bind('comment.notification', function(data) {
 
+
                 // console.log(typeof data.post_owner_id);
                         if (data.state) {
                             if (parseInt(auth_user) === parseInt(data.post_owner_id)) {
+
+                                if(typeof fetchNotifications === 'function') {
+                                    fetchNotifications();
+                                }
                                 toastr.info(
                                     `<div class="notification-content">
                                         <i class="fas fa-user"></i> <span>${data.author}</span>

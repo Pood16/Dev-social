@@ -5,6 +5,7 @@ use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
@@ -44,8 +45,8 @@ Route::group(['prefix'=> 'project'], function () {
 
 
 // notifications routes
-Route::post('/mark-as-read', [NotificationsController::class,'markAsRead'])->name('mark-as-read');
-Route::get('/test', [HomeController::class,'index'])->name('homeTest');
+Route::post('/notifications/mark-as-read', [NotificationController::class,'markAsRead'])->name('mark-as-read')->middleware('auth');
+Route::get('/notifications', [NotificationController::class,'index'])->name('index.notifications')->middleware('auth');
 
 
 

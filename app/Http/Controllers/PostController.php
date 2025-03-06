@@ -219,10 +219,6 @@ class PostController extends Controller
     public function markAsRead(){
         $user = Auth::user();
         $user->unreadNotifications->markAsRead();
-        // // dd($user->unreadNotifications);
-        // foreach ($user->unreadNotifications as $notification) {
-        //     $notification->markAsRead();
-        // }
         return redirect()->back();
     }
 
