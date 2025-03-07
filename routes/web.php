@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\PostController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
 
 Route::get('/', function () {
     return view('welcome');
@@ -48,7 +50,8 @@ Route::group(['prefix'=> 'project'], function () {
 Route::post('/notifications/mark-as-read', [NotificationController::class,'markAsRead'])->name('mark-as-read')->middleware('auth');
 Route::get('/notifications', [NotificationController::class,'index'])->name('index.notifications')->middleware('auth');
 
-
+// chat routes
+Route::get('/chat', [HomeController::class, 'chat'])->middleware('auth')->name('chat');
 
 Route::get('/index', function () {
     return view('index');
@@ -70,5 +73,18 @@ Route::view('pusher2', 'pusher2');
 Route::get('/search/hashtags', [SearchController::class, 'searchHashtags'])->middleware('auth')->name('search.hashtags');
 
 
+
+
+
+Route::get('/chat/{user}', function (User $user){
+    return view('chat', [
+        'user' => $user
+    ]);
+})->middleware(['auth', 'verified'])->name('chat');
+
+Route::resource(
+    'messages/{user}',
+    ChatController::class, ['only' => ['index', 'store']]
+)->middleware(['auth']);
 
 require __DIR__.'/auth.php';
