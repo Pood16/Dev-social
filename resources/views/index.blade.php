@@ -136,6 +136,40 @@
         </div>
     </div>
 </div>
+<script>
+     // Post Modal
+     function openPostModal() {
+        document.getElementById('postModal').classList.remove('hidden');
+    }
 
+    function closePostModal() {
+        document.getElementById('postModal').classList.add('hidden');
+    }
+
+    function toggleBold() {
+        const titleInput = document.getElementById('title');
+        if (titleInput.style.fontWeight === 'bold') {
+            titleInput.style.fontWeight = 'normal';
+        } else {
+            titleInput.style.fontWeight = 'bold';
+        }
+    }
+
+    // Preview uploaded image
+    document.getElementById('image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.createElement('img');
+                preview.src = e.target.result;
+                preview.classList.add('mt-1', 'rounded-md', 'max-h-32', 'mx-auto', 'overflow-scroll');
+                const container = document.querySelector('.space-y-1');
+                container.appendChild(preview);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 </x-app-layout>
 

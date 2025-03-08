@@ -12,79 +12,73 @@ use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 
+require __DIR__.'/auth.php';
+
+// Public routes
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/index', [HomeController::class, 'index'])->middleware('auth')->name('feeds');
-// complete profile
-Route::group(['prefix'=> 'profile'], function () {
-    Route::get('/', [ProfileController::class, 'show'])->middleware('auth')->name('profile');
-    Route::get('/update', [ProfileController::class, 'showEditProfile'])->middleware('auth')->name('profile.edit');
-    Route::post('/update', [ProfileController::class, 'updateProfile'])->middleware('auth')->name('profile.update');
-    Route::post('/cover', [ProfileController::class, 'updateCover'])->middleware('auth')->name('profile.cover');
-    Route::post('/self', [ProfileController::class, 'updateProfileImage'])->middleware('auth')->name('profile.self');
+// Auth routes
+Route::middleware(['auth'])->group(function () {
+    // Home/Feed routes
+    Route::get('/index', [HomeController::class, 'index'])->name('feeds');
+    Route::get('/chat', [HomeController::class, 'chat'])->name('chat');
 
- });
+    // Profile routes
+    Route::group(['prefix'=> 'profile'], function () {
+        Route::get('/', [ProfileController::class, 'show'])->name('profile');
+        Route::get('/update', [ProfileController::class, 'showEditProfile'])->name('profile.edit');
+        Route::post('/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/cover', [ProfileController::class, 'updateCover'])->name('profile.cover');
+        Route::post('/self', [ProfileController::class, 'updateProfileImage'])->name('profile.self');
+    });
 
-//  post routes
-Route::group(['prefix'=> 'post'], function () {
-    Route::get('/index', [PostController::class,'index'])->middleware('auth')->name('feeds');
-    Route::post('/store', [PostController::class,'store'])->middleware('auth')->name('post.store');
-    Route::get('/{post}/show', [PostController::class,'show'])->middleware('auth')->name('post.show');
-    Route::put('/{post}', [PostController::class,'update'])->middleware('auth')->name('post.update');
-    Route::delete('/{post}', [PostController::class, 'destroy'])->middleware('auth')->name('post.destroy');
-    Route::post('/{id}/comments', [CommentController::class, 'store'])->name('posts.comments.store');
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-    Route::post('/{post}/like', [PostController::class, 'toggleLike'])->name('posts.like');
-    Route::get('/{post}/check-like', [PostController::class, 'checkLike'])->name('posts.checkLike');
+    // Post routes
+    Route::group(['prefix'=> 'post'], function () {
+        Route::get('/index', [PostController::class, 'index'])->name('feeds');
+        Route::post('/store', [PostController::class, 'store'])->name('post.store');
+        Route::get('/{post}/show', [PostController::class, 'show'])->name('post.show');
+        Route::put('/{post}', [PostController::class, 'update'])->name('post.update');
+        Route::delete('/{post}', [PostController::class, 'destroy'])->name('post.destroy');
+        Route::post('/{post}/like', [PostController::class, 'toggleLike'])->name('posts.like');
+        Route::get('/{post}/check-like', [PostController::class, 'checkLike'])->name('posts.checkLike');
+
+        // Comment routes
+        Route::post('/{id}/comments', [CommentController::class, 'store'])->name('posts.comments.store');
+        Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    });
+
+    // Project routes
+    Route::group(['prefix'=> 'project'], function () {
+        Route::post('/store', [ProjectController::class, 'store'])->name('project.store');
+    });
+
+    // Notification routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('index.notifications');
+    Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
+
+    // Connection routes
+    Route::controller(ConnectionController::class)->group(function () {
+        Route::post('/post/connections/send/{user}', 'sendRequest')->name('request.send');
+        Route::get('/post/connections/status/{user}', 'checkConnectionStatus')->name('request.status');
+        Route::get('/connections/accepted', 'getAcceptedConnections')->name('connections.accepted');
+        Route::get('/connections', 'getAllConnections')->name('connections');
+        Route::post('/connections/accept/{connection}', 'acceptRequest')->name('connections.accept');
+        Route::post('/connections/reject/{connection}', 'rejectRequest')->name('connections.reject');
+        Route::delete('/connections/destroy/{connection}', 'removeConnection')->name('connections.destroy');
+    });
+
+    // Search routes
+    Route::get('/search/hashtags', [SearchController::class, 'searchHashtags'])->name('search.hashtags');
 });
-// project routes
-Route::group(['prefix'=> 'project'], function () {
-    // Route::get('/index', [ProjectController::class,'index'])->middleware('auth')->name('project.index');
-    Route::post('/store', [ProjectController::class,'store'])->middleware('auth')->name('project.store');
-});
 
-
-// notifications routes
-Route::post('/notifications/mark-as-read', [NotificationController::class,'markAsRead'])->name('mark-as-read')->middleware('auth');
-Route::get('/notifications', [NotificationController::class,'index'])->name('index.notifications')->middleware('auth');
-
-// chat routes
-Route::get('/chat', [HomeController::class, 'chat'])->middleware('auth')->name('chat');
-
-Route::get('/index', function () {
-    return view('index');
-})->middleware(['auth', 'verified'])->name('index');
-
-// connection routes
-Route::controller(ConnectionController::class)->middleware('auth')->group(function () {
-    Route::post('/post/connections/send/{user}', 'sendRequest')->name('request.send');
-    Route::get('/post/connections/status/{user}', 'checkConnectionStatus')->name('request.status');
-    Route::get('/connections/accepted', 'getAcceptedConnections')->name('connections.accepted');
-    Route::get('/connections', 'getAllConnections')->name('connections');
-    Route::post('/connections/accept/{connection}', 'acceptRequest')->name('connections.accept');
-    Route::post('/connections/reject/{connection}', 'rejectRequest')->name('connections.reject');
-    Route::delete('/connections/destroy/{connection}', 'removeConnection')->name('connections.destroy');
-});
-
+// Development routes
 Route::view('pusher1', 'pusher1');
 Route::view('pusher2', 'pusher2');
-Route::get('/search/hashtags', [SearchController::class, 'searchHashtags'])->middleware('auth')->name('search.hashtags');
 
 
 
 
 
-Route::get('/chat/{user}', function (User $user){
-    return view('chat', [
-        'user' => $user
-    ]);
-})->middleware(['auth', 'verified'])->name('chat');
 
-Route::resource(
-    'messages/{user}',
-    ChatController::class, ['only' => ['index', 'store']]
-)->middleware(['auth']);
-
-require __DIR__.'/auth.php';
