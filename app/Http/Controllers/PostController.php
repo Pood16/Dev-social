@@ -14,8 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class PostController extends Controller
-{
+class PostController extends Controller{
 
     public function index()
     {
@@ -109,36 +108,34 @@ class PostController extends Controller
     }
 
 
-    public function update(Request $request, Post $post)
-{
-    if ($post->user_id !== Auth::id()) {
-        abort(403);
-    }
-
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'links' => 'nullable|url|max:255',
-        'hashtags' => 'nullable|string',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
-
-    if ($request->hasFile('image')) {
-
-        if ($post->image) {
-            Storage::delete($post->image);
+    public function update(Request $request, Post $post){
+        if ($post->user_id !== Auth::id()) {
+            abort(403);
         }
-        $validated['image'] = $request->file('image')->store('posts', 'public');
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'links' => 'nullable|url|max:255',
+            'hashtags' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+
+            if ($post->image) {
+                Storage::delete($post->image);
+            }
+            $validated['image'] = $request->file('image')->store('posts', 'public');
+        }
+
+        $post->update($validated);
+
+        return redirect()->route('feeds')->with('success', 'Post updated successfully');
     }
 
-    $post->update($validated);
 
-    return redirect()->route('feeds')->with('success', 'Post updated successfully');
-    }
-
-
-    public function destroy(Post $post)
-    {
+    public function destroy(Post $post){
         if ($post->user_id !== Auth::id()) {
             abort(403);
         }
@@ -153,8 +150,7 @@ class PostController extends Controller
         return redirect()->route('feeds')->with('success', 'Post deleted successfully');
     }
 
-    public function comment(Request $request, Post $post)
-    {
+    public function comment(Request $request, Post $post){
         $request->validate([
             'content' => 'required',
         ]);
@@ -168,8 +164,7 @@ class PostController extends Controller
     }
 
     //Filter posts by hashtag.
-    public function filterByHashtag($hashtag)
-    {
+    public function filterByHashtag($hashtag){
         $posts = Hashtag::where('name', $hashtag)->firstOrFail()->posts()->paginate(10);
         return view('posts.index', compact('posts'));
     }

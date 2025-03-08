@@ -88,7 +88,7 @@
                   <div class="py-3 flex justify-between">
                     <dt class="text-sm font-medium text-gray-500">Website</dt>
                     <dd class="text-sm text-amber-600 hover:text-amber-700">
-                      <a href="#">sarahconnor.dev</a>
+                      <a href="3.90.8.127">Dev-social</a>
                     </dd>
                   </div>
                 </dl>
