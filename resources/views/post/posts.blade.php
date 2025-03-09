@@ -7,10 +7,14 @@
                     <!-- Post Header -->
                     <div class="p-4 flex items-center justify-between">
                         <div class="flex items-center space-x-4">
-                            <img src="{{ $post->user->profile_picture ? asset('storage/' . $post->user->profile_picture) : asset('images/default-avatar.png') }}"
-                                class="h-10 w-10 rounded-full object-cover">
+                            <a href="{{ route('user.profile', $post->user->id) }}">
+                                <img src="{{ $post->user->profile_picture ? asset('storage/' . $post->user->profile_picture) : asset('images/default-avatar.png') }}"
+                                    class="h-10 w-10 rounded-full object-cover">
+                            </a>
                             <div>
-                                <h3 class="font-medium text-gray-900">{{ $post->user->name }}</h3>
+                                <a href="{{ route('user.profile', $post->user->id) }}" class="font-medium text-gray-900 hover:text-amber-600">
+                                    {{ $post->user->name }}
+                                </a>
                                 <p class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
                             </div>
                         </div>
@@ -18,17 +22,23 @@
                         <!-- Post Actions  -->
                         <div class="relative">
                             @if($post->user_id === Auth::id())
-                                <div class="flex items-center space-x-2">
-                                    <a href="{{ route('post.show', $post) }}"
+                                <div class="relative">
+                                    <button id="dropdownButton-{{ $post->id }}" onclick=" toggleEllipsDropdown({{ $post->id }})"
                                         class="text-gray-400 hover:text-amber-600 transition-colors cursor-pointer">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button onclick="deletePost({{ $post->id }})"
-                                        class="text-gray-400 hover:text-red-600 transition-colors cursor-pointer">
-                                        <i class="fas fa-trash"></i>
+                                        <i class="fas fa-ellipsis-v"></i>
                                     </button>
+                                    <div id="dropdown-{{ $post->id }}"
+                                        class="hidden absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg z-10 py-1">
+                                        <a href="{{ route('post.show', $post) }}"
+                                            class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                            <i class="fas fa-edit mr-2"></i> Edit Post
+                                        </a>
+                                        <button onclick="deletePost({{ $post->id }})"
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                            <i class="fas fa-trash mr-2"></i> Delete Post
+                                        </button>
+                                    </div>
                                 </div>
-                           <!-- filepath: /c:/laravel_Projects/dev-social/resources/views/index.blade.php -->
                             @else
                             <button onclick="sendConnectionRequest({{ $post->user->id }})"
                                 class="text-gray-400 hover:text-amber-600 transition-colors flex items-center space-x-1 connect-button"
@@ -160,5 +170,22 @@
             </div> --}}
         </div>
     </div>
+
+
+    <script>
+        // Ellipsis menu
+        function toggleEllipsDropdown(postId) {
+            const dropdown = document.getElementById(`dropdown-${postId}`);
+            dropdown.classList.toggle('hidden');
+
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!e.target.closest(`#dropdownButton-${postId}`) &&
+                    !e.target.closest(`#dropdown-${postId}`)) {
+                    dropdown.classList.add('hidden');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+    </script>
 
 

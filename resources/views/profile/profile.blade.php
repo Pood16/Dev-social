@@ -11,7 +11,7 @@
           @else
            <img src="{{Storage::url($user->cover_picture)}}" alt="Cover Picture" class="w-full h-full object-cover">
           @endempty
-          <!-- Form for Uploading New Cover -->
+          <!-- new cover -->
           <form action="{{ route('profile.cover') }}" method="POST" enctype="multipart/form-data" class="absolute inset-0 flex items-end justify-end p-4"> @csrf
             <!-- Styled File Input -->
             <input type="file" name="cover_image" id="cover_image" class="hidden" onchange="this.form.submit()">
@@ -24,7 +24,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
           <div class="-mt-24 sm:-mt-32 sm:flex sm:items-end sm:space-x-5">
             <div class="relative group">
-              <form action="{{route('profile.self')}}" method="POST" enctype="multipart/form-data" class="relative w-fit"> @csrf
+              <form action="{{route('profile.self')}}" method="POST" enctype="multipart/form-data" class="relative w-fit">
+                 @csrf
                 <!-- Profile Picture Container -->
                 <div class="h-32 w-32 sm:h-40 sm:w-40 rounded-full ring-4 ring-white overflow-hidden bg-white relative"> @empty($user->profile_picture) <img src="https://static.vecteezy.com/system/resources/thumbnails/006/487/917/small_2x/man-avatar-icon-free-vector.jpg" alt="Cover Picture" class="w-full h-full object-cover"> @else <img src="{{Storage::url($user->profile_picture)}}" alt="Cover Picture" class="w-full h-full object-cover"> @endempty <img src="{{ Storage::url($user->profile_picture) }}" alt="Profile picture" class="object-cover w-full h-full">
                   <!-- Hidden File Input -->
@@ -39,12 +40,11 @@
             <div class="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
               <div class="sm:hidden md:block mt-6 min-w-0 flex-1">
                 <h1 class="text-2xl font-bold text-gray-900 truncate">{{$user->name}}</h1>
-                {{-- <p class="text-gray-500">Full Stack Developer</p> --}}
               </div>
-              <div class="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
-                <a href="{{route('profile.edit')}}" type="button" class="inline-flex justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+              <div class="mt-6">
+                <a href="{{route('profile.edit')}}" type="button" class="inline-flex justify-center items-center gap-x-1 px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
                   <i class="fas fa-pen -ml-1 mr-2"></i>
-                  <span>Edit profile</span>
+                  <span>Edit/complete profile</span>
                 </a>
               </div>
             </div>
@@ -56,7 +56,6 @@
         </div>
       </div>
 
-      <!-- Profile Navigation -->
 
       <!-- Profile Content -->
       <div class="py-8 w-10/12 mx-auto px-4 sm:px-6 lg:px-8 mt-5">
@@ -78,17 +77,9 @@
                         </dd>
                     </div>
                   <div class="py-3 flex justify-between">
-                    <dt class="text-sm font-medium text-gray-500">Location</dt>
-                    <dd class="text-sm text-gray-900">Nador, idawtanan</dd>
-                  </div>
-                  <div class="py-3 flex justify-between">
-                    <dt class="text-sm font-medium text-gray-500">Work</dt>
-                    <dd class="text-sm text-gray-900">TechForward Inc.</dd>
-                  </div>
-                  <div class="py-3 flex justify-between">
                     <dt class="text-sm font-medium text-gray-500">Website</dt>
                     <dd class="text-sm text-amber-600 hover:text-amber-700">
-                      <a href="3.90.8.127">Dev-social</a>
+                      <a href="http://3.90.8.127/" target="_blank">Dev-social</a>
                     </dd>
                   </div>
                 </dl>
@@ -104,7 +95,7 @@
                   <h2 class="text-lg font-medium text-gray-900">Skills</h2>
                   <button onclick="openSkillModal()" class="text-sm text-amber-600 hover:text-amber-700">
                     <i class="fas fa-plus mr-1"></i> Add
-                </button>
+                  </button>
                 <div id="skillModal" class="fixed inset-0 hidden">
                     <!-- Modal backdrop -->
                     <div class="absolute inset-0 bg-gray-900 opacity-70"></div>
@@ -118,7 +109,7 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
-                                <form action="" method="POST">
+                                <form id="skillForm" onsubmit="addSkill(event)">
                                     @csrf
                                     <div class="mb-4">
                                         <label for="skill" class="block text-sm font-medium text-gray-700 mb-2">Skill Name</label>
@@ -260,6 +251,55 @@
 
         function closeSkillModal() {
             document.getElementById('skillModal').classList.add('hidden');
+        }
+        // Add new skill
+        async function addSkill(event) {
+            event.preventDefault();
+
+            const skillInput = document.getElementById('skill');
+            const skill = skillInput.value.trim();
+
+            if (!skill) {
+                alert('Please enter a skill name');
+                return;
+            }
+
+            try {
+                const response = await fetch('/profile/skills/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ skill })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Something went wrong');
+                }
+
+                // Clear the input
+                skillInput.value = '';
+
+                // Close modal
+                closeSkillModal();
+
+                // Update skills display
+                const skillsContainer = document.querySelector('.flex.flex-wrap.gap-2');
+
+                if (data.skills && data.skills.length > 0) {
+                    skillsContainer.innerHTML = data.skills.map(skill =>
+                        `<span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm">${skill.trim()}</span>`
+                    ).join('');
+                }
+
+            } catch (error) {
+                console.error('Error adding skill:', error);
+                alert(error.message || 'Failed to add skill');
+            }
         }
 
         // projects modal

@@ -14,7 +14,7 @@ use App\Models\User;
 
 require __DIR__.'/auth.php';
 
-// Public routes
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -32,6 +32,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
         Route::post('/cover', [ProfileController::class, 'updateCover'])->name('profile.cover');
         Route::post('/self', [ProfileController::class, 'updateProfileImage'])->name('profile.self');
+        Route::post('/skills/add', [ProfileController::class, 'addSkills'])->name('profile.skills.add');
+        Route::get('/user/{userId}', [ProfileController::class, 'showUserProfile'])->name('user.profile');
     });
 
     // Post routes

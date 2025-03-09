@@ -14,20 +14,11 @@ class LikeNotification extends Notification
     use Queueable;
     protected $post;
 
-    /**
-     * Create a new notification instance.
-     */
     public function __construct($post)
     {
         $this->post = $post;
     }
 
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
@@ -39,6 +30,7 @@ class LikeNotification extends Notification
             'user_name' => Auth::user()->name,
             'message' => 'Liked your post',
             'post_title' => $this->post->title,
+            'post_owner_id' => $this->post->user_id,
             'type' => 'like'
         ];
     }
@@ -48,7 +40,8 @@ class LikeNotification extends Notification
             'user_name' => Auth::user()->name,
             'message' => 'Liked your Post',
             'post_title' => $this->post->title,
-            'type' => 'like'
+            'type' => 'like',
+            'post_owner_id' => $this->post->user_id,
         ]);
     }
 

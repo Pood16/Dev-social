@@ -10,16 +10,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
-class ProfileController extends Controller
-{
+class ProfileController extends Controller{
 
     public function show(){
         $user = Auth::user();
         return view("profile.profile", compact("user"));
     }
+
     // update the profile section
     public function showEditProfile(){
-        $user = User::where("id",Auth::user()->id)->first();
+        $user = Auth::user();
         return view("profile.edit", compact("user"));
     }
     // submit the profile updates
@@ -41,8 +41,6 @@ class ProfileController extends Controller
 
     // cover and profile image update
     public function updateCover(Request $request){
-        // $user = User::where("id",Auth::user()->id)->first();
-
         $imagepath = $request->file('cover_image') ? $request->file('cover_image')->store('profile-covers', 'public') : null;
         $request->user()->cover_picture = $imagepath;
         $request->user()->save();
@@ -56,11 +54,52 @@ class ProfileController extends Controller
         return  Redirect::route('profile');
     }
 
-    public function edit(Request $request): View
-    {
+    public function edit(Request $request): View{
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
+    }
+
+    // add new skills(Languages) To profile
+    public function addSkills(Request $request){
+
+        $request->validate([
+            'skill' => 'required|string|max:255',
+        ]);
+
+        $user = Auth::user();
+        $currentSkills = $user->language ?? '';
+
+
+        if ($currentSkills) {
+            $skills = explode(',', $currentSkills);
+            $skills[] = $request->skill;
+            $newSkills = implode(',', $skills);
+        } else {
+            $newSkills = $request->skill;
+        }
+
+        $user->language = $newSkills;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Skill added successfully',
+            'skills' => explode(',', $newSkills),
+        ]);
+    }
+
+
+
+    public function showUserProfile($userId){
+
+        $user = User::findOrFail($userId);
+        $posts = $user->posts()->with(['user', 'likes', 'comments.user'])->latest()->paginate(10);
+
+
+        $isOwnProfile = Auth::id() === $user->id;
+
+        return view("profile.user-profile", compact("user", "posts", "isOwnProfile"));
     }
 
 

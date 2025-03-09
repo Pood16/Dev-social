@@ -51,9 +51,9 @@ class ChatController extends Controller
         ]);
     }
 
-    /**
-     * Get all conversations for the authenticated user
-     */
+
+    //  Get all conversations for the authenticated user
+
     public function getConversations(){
         $user = Auth::user();
 
@@ -104,8 +104,9 @@ class ChatController extends Controller
     /**
      * Send a new message
      */
-    public function sendMessage(Request $request)
-    {
+    public function sendMessage(Request $request){
+
+
         $request->validate([
             'recipient_id' => 'required|exists:users,id',
             'message' => 'required|string',
