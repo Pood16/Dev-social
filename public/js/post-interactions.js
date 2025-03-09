@@ -233,7 +233,7 @@
 
     /*
     ****** Send connection request
-    */t
+    */
     async function sendConnectionRequest(userId) {
             try {
                 const token = document.querySelector('meta[name="csrf-token"]')?.content;

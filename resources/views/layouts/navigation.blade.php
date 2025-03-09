@@ -11,7 +11,7 @@
                 <a href="{{route('feeds')}}" class="{{request()->routeIs('feeds') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900  hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"> Feed </a>
                 <a href="{{route('connections')}}" class="{{request()->routeIs('connections') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"> Connections </a>
                 <a href="{{route('profile')}}" class="{{request()->routeIs('profile') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"> Profile </a>
-                <a href="{{route('chat')}}" class="{{request()->routeIs('chat') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"> Messanger </a>
+                <a href="{{route('chat.index')}}" class="{{request()->routeIs('chat') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"> Messanger </a>
 
             </div>
           </div>

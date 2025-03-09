@@ -1,163 +1,280 @@
 <x-app-layout>
-<div class="flex h-[calc(100vh-90px)] bg-gray-50 w-11/12 mx-auto">
-    <!-- Connections sidebar  -->
-    <div class="w-1/3 bg-white border-r border-gray-200 flex flex-col">
-        <!-- Header -->
-        <div class="p-4 border-b border-gray-200">
-            <h2 class="text-lg font-medium text-gray-900">Connections</h2>
-            <div class="mt-2 relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
+    <div class="container mx-auto py-4 h-[calc(100vh-90px)]">
+        <div class="flex border rounded shadow h-full">
+            <!-- My Connections -->
+            <div class="w-1/3 border-r overflow-y-auto" id="connections-panel">
+                <h2 class="text-lg font-bold p-4">Your Connections</h2>
+                <div id="connections-list">
+                    @forelse($connections as $connection)
+                        @php
+                            $otherUser = $connection->other_user;
+                        @endphp
+                        <button class="w-full p-3 hover:bg-gray-100 flex items-center cursor-pointer connection-item"
+                            data-user-id="{{ $otherUser->id }}"
+                            data-user-name="{{ $otherUser->name }}"
+                            data-user-photo="{{ $otherUser->profile_picture ? Storage::url($otherUser->profile_picture) : asset('images/default-avatar.png')}}">
+                            <img src="{{ $otherUser->profile_picture ? Storage::url($otherUser->profile_picture) : asset('images/default-avatar.png') }}"
+                                class="w-10 h-10 rounded-full object-cover mr-3" alt="">
+                            <span class="font-medium">{{ $otherUser->name }}</span>
+                        </button>
+                    @empty
+                        <p class="p-4 text-gray-500">No connections found. Create or accept a connection to start chatting.</p>
+                    @endforelse
                 </div>
-                <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    placeholder="Search connections...">
+            </div>
+
+            <!-- Conversation body -->
+            <div class="w-2/3 flex flex-col">
+                <!-- Header -->
+                <div class="border-b p-4 flex items-center" id="chat-header">
+                    <img src="{{ asset('images/default-avatar.jpg') }}" alt="Avatar"
+                        class="w-10 h-10 rounded-full object-cover mr-3" id="chat-user-avatar">
+                    <div>
+                        <h2 class="font-bold" id="chat-user-name">Select a connection</h2>
+                        <small class="text-gray-500" id="chat-user-status">---</small>
+                    </div>
+                </div>
+
+                <!-- Messages container -->
+                <div class="flex-1 p-4 overflow-y-auto" id="messages-container">
+                    <div class="flex items-center justify-center h-full text-gray-500" id="empty-state">
+                        Select a connection to start chatting!
+                    </div>
+                </div>
+
+                <!-- Message input -->
+                <div class="border-t p-3 hidden" id="message-input-container">
+                    <form id="message-form" class="flex items-center">
+                        <textarea id="message-input"
+                            class="border border-gray-300 rounded mr-2 p-2 focus:outline-none flex-1 resize-none"
+                            rows="1" placeholder="Type a message..."></textarea>
+                        <button type="submit" class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700">
+                            Send
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Connections list -->
-        <div class="flex-1 overflow-y-auto p-2" id="connections-list">
-            @forelse($connections as $connection)
-                @php
-                    $connectionUser = $connection->sender_id == Auth::id() ? $connection->receiver : $connection->sender;
-                    $isActive = $loop->first;
-                @endphp
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userId = {{ Auth::id() }};
+            let currentRecipientId = null;
 
-                <div class="flex items-center p-3 {{ $isActive ? 'bg-amber-50' : 'hover:bg-gray-50' }} rounded-lg mb-2 cursor-pointer connection-item"
-                     data-user-id="{{ $connectionUser->id }}" data-user-name="{{ $connectionUser->name }}">
-                    <div class="relative">
-                        <img src="{{ $connectionUser->profile_picture ? Storage::url($connectionUser->profile_picture) : asset('images/default-avatar.png') }}"
-                             alt="{{ $connectionUser->name }}"
-                             class="h-12 w-12 rounded-full object-cover {{ $isActive ? 'border-2 border-amber-500' : '' }}">
-                        <span class="absolute bottom-0 right-0 h-3 w-3 bg-gray-400 rounded-full border-2 border-white user-status"></span>
-                    </div>
-                    <div class="ml-3 flex-1">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-medium text-gray-900">{{ $connectionUser->name }}</h3>
-                            {{-- <span class="text-xs text-gray-500 last-message-time">-</span> --}}
+            const connectionsList = document.getElementById('connections-list');
+            const messagesContainer = document.getElementById('messages-container');
+            const emptyState = document.getElementById('empty-state');
+            const messageForm = document.getElementById('message-form');
+            const messageInput = document.getElementById('message-input');
+            const messageInputContainer = document.getElementById('message-input-container');
+            const chatUserName = document.getElementById('chat-user-name');
+            const chatUserStatus = document.getElementById('chat-user-status');
+            const chatUserAvatar = document.getElementById('chat-user-avatar');
+
+
+            connectionsList.addEventListener('click', function(event) {
+
+                const connectionItem = event.target.closest('.connection-item');
+
+                if (!connectionItem) return;
+
+                // console.log('Connection clicked:', connectionItem.dataset.userName);
+
+                currentRecipientId = connectionItem.dataset.userId;
+
+                // Update header
+                chatUserName.textContent = connectionItem.dataset.userName;
+                chatUserStatus.textContent = 'Online';
+                chatUserAvatar.src = connectionItem.dataset.userPhoto;
+
+                // Clear previous messages
+                messagesContainer.innerHTML = '';
+
+                // Hide empty state and show message input
+                emptyState.style.display = 'none';
+                messageInputContainer.classList.remove('hidden');
+
+                // Load messages
+                loadMessages(currentRecipientId);
+
+                // Highlight the selected connection
+                document.querySelectorAll('.connection-item').forEach(item => {
+                    item.classList.remove('bg-amber-50');
+                });
+                connectionItem.classList.add('bg-amber-50');
+            });
+
+            // Handle sending a message
+            messageForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!currentRecipientId || !messageInput.value.trim()) return;
+
+                const msgText = messageInput.value.trim();
+
+                // Reset input
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+
+                // Optimistically display the outgoing message
+                appendMessage({
+                    id: 'temp-' + Date.now(),
+                    from_user_id: userId,
+                    message: msgText,
+                    created_at: new Date().toISOString(),
+                    pending: true
+                }, true);
+
+                // Send to server
+                fetch('{{ route("chat.send") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ recipient_id: currentRecipientId, message: msgText })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Message sent:', data);
+                })
+                .catch(err => {
+                    console.error('Send error:', err);
+                });
+            });
+
+            // Load messages from server
+            function loadMessages(recipientId) {
+                console.log('Loading messages for recipient:', recipientId);
+
+                // Show loading indicator
+                messagesContainer.innerHTML = '<div class="flex justify-center py-4"><div class="animate-spin rounded-full h-6 w-6 border-t-2 border-amber-500"></div></div>';
+
+                fetch(`{{ url('chat/messages') }}/${recipientId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch messages');
+                    }
+                    return response.json();
+                })
+                .then(messages => {
+                    // Clear messages container
+                    messagesContainer.innerHTML = '';
+
+                    if (!messages || messages.length === 0) {
+                        messagesContainer.innerHTML = `<p class="text-center text-gray-500 py-4">No messages yet. Say hello!</p>`;
+                    } else {
+                        messages.forEach(message => {
+                            const isSentByMe = (message.from_user_id == userId);
+                            appendMessage(message, isSentByMe);
+                        });
+                    }
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                })
+                .catch(err => {
+                    console.error('Load error:', err);
+                    messagesContainer.innerHTML = `<p class="text-center text-red-500 py-4">Failed to load messages.</p>`;
+                });
+            }
+
+            // Display a single message in UI
+            function appendMessage(message, isSent) {
+                const msgElement = document.createElement('div');
+                msgElement.className = `flex mb-2 ${isSent ? 'justify-end' : 'justify-start'}`;
+
+                // Handle both direct message objects and broadcast data structure
+                const msgText = message.message;
+                const msgId = message.id;
+                const msgTime = message.created_at;
+                const time = formatTime(msgTime);
+
+                // Basic HTML for sent vs received
+                if (isSent) {
+                    msgElement.innerHTML = `
+                        <div class="bg-amber-600 text-white p-2 rounded-lg rounded-br-none max-w-xs">
+                            <p>${escapeHTML(msgText)}</p>
+                            <div class="text-xs text-right opacity-70 mt-1">${time}</div>
                         </div>
-                        <p class="text-xs text-gray-500 truncate last-message-preview">No messages yet</p>
-                        <span class="hidden unread-badge ml-1 px-1.5 py-0.5 bg-amber-600 text-white rounded-full text-xs">0</span>
-                    </div>
-                </div>
-            @empty
-                <div class="p-6 text-center text-gray-500">
-                    <p>No connections found.</p>
-                    <p class="mt-2 text-sm">Connect with other developers to start chatting!</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
+                    `;
+                } else {
+                    msgElement.innerHTML = `
+                        <div class="bg-white border p-2 rounded-lg rounded-bl-none max-w-xs shadow-sm">
+                            <p>${escapeHTML(msgText)}</p>
+                            <div class="text-xs text-gray-500 text-right mt-1">${time}</div>
+                        </div>
+                    `;
+                }
 
-    <!-- Chat content  -->
-    <div class="w-2/3 flex flex-col bg-gray-50">
-        <!-- Chat header -->
-        <div class="p-4 border-b border-gray-200 bg-white flex items-center">
-            <div class="flex items-center">
-                <img src="https://via.placeholder.com/40" alt="User Avatar" class="h-10 w-10 rounded-full object-cover">
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-gray-900">Alex Johnson</h3>
-                    <p class="text-xs text-gray-500">Online</p>
-                </div>
-            </div>
-            <div class="ml-auto flex space-x-2">
-                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
-                    <i class="fas fa-phone"></i>
-                </button>
-                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
-                    <i class="fas fa-video"></i>
-                </button>
-                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
-            </div>
-        </div>
+                messagesContainer.appendChild(msgElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
 
-        <!-- Chat messages -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-4">
-            <!-- Date separator -->
-            <div class="flex justify-center">
-                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Today</span>
-            </div>
+            // Escape HTML to prevent XSS
+            function escapeHTML(str) {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
 
-            <!-- Received message -->
-            <div class="flex items-end">
-                <img src="https://via.placeholder.com/40" alt="User Avatar" class="h-8 w-8 rounded-full mr-2">
-                <div class="bg-white rounded-lg rounded-bl-none p-3 shadow-sm max-w-[70%]">
-                    <p class="text-gray-800 text-sm">Hey, how's the project coming along?</p>
-                    <span class="text-xs text-gray-500 mt-1 block">10:30 AM</span>
-                </div>
-            </div>
+            // Format time from ISO string
+            function formatTime(isoString) {
+                const date = new Date(isoString);
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
 
-            <!-- Sent message -->
-            <div class="flex items-end justify-end">
-                <div class="bg-amber-600 text-white rounded-lg rounded-br-none p-3 shadow-sm max-w-[70%]">
-                    <p class="text-sm">It's going well! Just working on the final touches.</p>
-                    <span class="text-xs opacity-80 mt-1 block">10:32 AM</span>
-                </div>
-            </div>
+            if (window.Pusher) {
+                Pusher.logToConsole = true;
+                console.log('Pusher is loaded and configured');
+            }
+            // Listen for incoming messages via Pusher/Echo
+            // Add connection diagnostics
+            if (window.Echo) {
+                // Add connection debugging
+                window.Echo.connector.pusher.connection.bind('connected', () => {
+                    console.log('✓ Successfully connected to Pusher!');
+                });
 
-            <!-- Received message -->
-            <div class="flex items-end">
-                <img src="https://via.placeholder.com/40" alt="User Avatar" class="h-8 w-8 rounded-full mr-2">
-                <div class="bg-white rounded-lg rounded-bl-none p-3 shadow-sm max-w-[70%]">
-                    <p class="text-gray-800 text-sm">Great! Do you think we can finish by tomorrow?</p>
-                    <span class="text-xs text-gray-500 mt-1 block">10:35 AM</span>
-                </div>
-            </div>
+                window.Echo.connector.pusher.connection.bind('error', (err) => {
+                    console.error('✗ Pusher connection error:', err);
+                });
 
-            <!-- Sent messages -->
-            <div class="flex items-end justify-end">
-                <div class="bg-amber-600 text-white rounded-lg rounded-br-none p-3 shadow-sm max-w-[70%]">
-                    <p class="text-sm">Definitely. I'm almost done with the frontend.</p>
-                    <span class="text-xs opacity-80 mt-1 block">10:36 AM</span>
-                </div>
-            </div>
+                console.log('Attempting to subscribe to chat.' + userId);
+                window.Echo.private(`chat.${userId}`)
+                    .listen('.new.message', data => {
+                        console.log('Received new message:', data);
 
-            <div class="flex items-end justify-end mt-2">
-                <div class="bg-amber-600 text-white rounded-lg rounded-br-none p-3 shadow-sm max-w-[70%]">
-                    <p class="text-sm">What about the API integration? Any issues there?</p>
-                    <span class="text-xs opacity-80 mt-1 block">10:36 AM</span>
-                </div>
-            </div>
+                        // If we're chatting with this sender, append it
+                        if (currentRecipientId == data.from_user_id) {
+                            // Use the correct data structure from broadcastWith()
+                            appendMessage({
+                                id: data.id,
+                                from_user_id: data.from_user_id,
+                                to_user_id: data.to_user_id,
+                                message: data.message,
+                                created_at: data.created_at
+                            }, false);
+                        } else {
+                            // Optional: Show notification for messages from others
+                            console.log(`New message from ${data.user?.name || 'someone'} while chatting with someone else`);
+                        }
+                    });
+            } else {
+                console.error('Echo is not defined. Pusher may not be configured correctly.');
+            }
 
-            <!-- Received message with image -->
-            <div class="flex items-end">
-                <img src="https://via.placeholder.com/40" alt="User Avatar" class="h-8 w-8 rounded-full mr-2">
-                <div class="bg-white rounded-lg rounded-bl-none p-3 shadow-sm max-w-[70%]">
-                    <p class="text-gray-800 text-sm mb-2">API is working perfectly. Here's a screenshot of the dashboard:</p>
-                    <img src="https://via.placeholder.com/300x150" alt="Screenshot" class="rounded-lg w-full">
-                    <span class="text-xs text-gray-500 mt-1 block">10:40 AM</span>
-                </div>
-            </div>
-
-            <!-- Typing indicator -->
-            <div class="flex items-end">
-                <img src="https://via.placeholder.com/40" alt="User Avatar" class="h-8 w-8 rounded-full mr-2">
-                <div class="bg-gray-100 rounded-full p-3 px-4">
-                    <div class="flex space-x-1">
-                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Message input area -->
-        <div class="p-4 border-t border-gray-200 bg-white">
-            <div class="flex items-center">
-                <button class="p-2 text-gray-500 hover:text-amber-600">
-                    <i class="fas fa-paperclip"></i>
-                </button>
-                <div class="flex-1 mx-2">
-                    <textarea rows="1" class="w-full border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
-                        placeholder="Type a message..."></textarea>
-                </div>
-                <button class="p-2 rounded-full bg-amber-600 text-white hover:bg-amber-700 flex items-center justify-center w-10 h-10">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+            // Auto-resize textarea
+            messageInput.addEventListener('input', () => {
+                messageInput.style.height = 'auto';
+                messageInput.style.height = (messageInput.scrollHeight) + 'px';
+            });
+        });
+    </script>
 </x-app-layout>

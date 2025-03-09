@@ -67,7 +67,9 @@
         </main>
 
 
-        <!-- pusher notification -->
+        @yield('scripts')
+
+
 
     </body>
 </html>

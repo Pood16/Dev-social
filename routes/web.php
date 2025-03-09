@@ -23,7 +23,7 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     // Home/Feed routes
     Route::get('/index', [HomeController::class, 'index'])->name('feeds');
-    Route::get('/chat', [HomeController::class, 'chat'])->name('chat');
+    // Route::get('/chat', [HomeController::class, 'chat'])->name('chat');
 
     // Profile routes
     Route::group(['prefix'=> 'profile'], function () {
@@ -76,6 +76,20 @@ Route::middleware(['auth'])->group(function () {
 // Development routes
 Route::view('pusher1', 'pusher1');
 Route::view('pusher2', 'pusher2');
+
+// Route::middleware('auth')->group(function () {
+//     Route::get('/messages', [ChatController::class, 'fetchMessages']);
+//     Route::post('/send-message', [ChatController::class, 'sendMessage']);
+// });
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/conversations', [ChatController::class, 'getConversations'])->name('chat.conversations');
+    Route::get('/chat/messages/{userId}', [ChatController::class, 'getMessages'])->name('chat.messages');
+    Route::post('/chat/messages', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::get('/chat/unread', [ChatController::class, 'getUnreadCount'])->name('chat.unread');
+    Route::post('/chat/messages/{messageId}/read', [ChatController::class, 'markAsRead'])->name('chat.read');
+});
 
 
 
