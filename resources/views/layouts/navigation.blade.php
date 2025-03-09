@@ -8,10 +8,10 @@
                 <span class="text-gray-900 font-bold text-xl">DevConnect</span>
             </div>
             <div class="hidden sm:ml-6 sm:flex items-center sm:space-x-8">
-                <a href="{{route('feeds')}}" class="{{request()->routeIs('feeds') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900  hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"> Feed </a>
-                <a href="{{route('connections')}}" class="{{request()->routeIs('connections') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"> Connections </a>
-                <a href="{{route('profile')}}" class="{{request()->routeIs('profile') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"> Profile </a>
-                <a href="{{route('chat.index')}}" class="{{request()->routeIs('chat') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"> Messanger </a>
+                <a href="{{route('feeds')}}" class="{{request()->routeIs('feeds') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900  hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-lg font-medium"> Feed </a>
+                {{-- <a href="{{route('connections')}}" class="{{request()->routeIs('connections') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"> Connections </a> --}}
+                {{-- <a href="{{route('profile')}}" class="{{request()->routeIs('profile') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"> Profile </a> --}}
+                {{-- <a href="{{route('chat.index')}}" class="{{request()->routeIs('chat') ? "border-b-2 border-amber-500" : "border-transparent hover:border-gray-300" }} text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"> Messanger </a> --}}
 
             </div>
           </div>
@@ -27,7 +27,7 @@
             </form>
         </div>
         <!-- right side -->
-        <div class="flex items-center">
+        <div class="flex items-center gap-x-3">
             <!-- Post Button -->
             <div class="flex-shrink-0 mr-4">
                 <button type="button" onclick="openPostModal()"
@@ -35,9 +35,27 @@
                    <i class="fas fa-plus mr-2"></i> Create Post
                 </button>
             </div>
+            <!-- messages -->
+            <div class="relative mr-3">
+                <a href="{{ route('chat.index') }}" class="text-gray-500 hover:text-gray-700">
+                    {{-- <span class="sr-only">View messages</span> --}}
+                    <i class="fas fa-comment-alt text-xl"></i>
+                </a>
+
+                <!-- Unread message  -->
+                <span id="unread-messages-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;">0</span>
+            </div>
+
+            <!-- Connections -->
+            <div class="relative mr-3">
+                <a href="{{ route('connections') }}" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-user-friends text-xl"></i>
+                </a>
+                <!-- Optional: connection requests  -->
+                <span id="connection-requests-badge" class="absolute -top-1 -right-1 bg-amber-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center" style="display: none;">0</span>
+            </div>
 
             <!-- notifications -->
-
             <x-notification/>
 
             <!-- end -->
@@ -60,6 +78,17 @@
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="user-menu-button">
+                    <!-- Profile Link -->
+                    <a href="{{ route('profile') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        role="menuitem">
+                        Profile
+                    </a>
+
+                    <!--Divider -->
+                    <div class="border-t border-gray-100 my-1"></div>
+
+                    <!-- Logout Button -->
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
