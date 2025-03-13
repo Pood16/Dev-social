@@ -203,6 +203,7 @@ class PostController extends Controller{
         ]);
     }
 
+
     public function checkLike(Post $post){
         return response()->json([
             'isLiked' => $post->likes()->where('user_id', Auth::id())->exists()
