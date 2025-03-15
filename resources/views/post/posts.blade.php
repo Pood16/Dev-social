@@ -8,7 +8,7 @@
                     <div class="p-4 flex items-center justify-between">
                         <div class="flex items-center space-x-4">
                             <a href="{{ route('user.profile', $post->user->id) }}">
-                                <img src="{{ $post->user->profile_picture ? asset('storage/' . $post->user->profile_picture) : asset('images/default-avatar.png') }}"
+                                <img src="{{ $post->user->profile_picture ? asset('storage/' . $post->user->profile_picture) : asset('images/profile-avatar.png') }}"
                                     class="h-10 w-10 rounded-full object-cover">
                             </a>
                             <div>
@@ -104,27 +104,48 @@
                                 </button>
                             </div>
                             <!-- right side -->
-                            <button class="flex items-center space-x-2 hover:text-amber-600">
-                                <i class="far fa-share-square"></i>
-                                <span>Share</span>
-                            </button>
+                            <div class="relative">
+                                <button onclick="toggleShareDropdown({{ $post->id }})" class="flex items-center space-x-2 hover:text-amber-600">
+                                    <i class="far fa-share-square"></i>
+                                    <span>Share</span>
+                                </button>
+                                <div id="share-dropdown-{{ $post->id }}" class="hidden absolute right-0 bottom-10 w-48 bg-white rounded-md shadow-lg z-10 py-1">
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('post.show', $post)) }}" target="_blank" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                        <i class="fab fa-facebook-f mr-3 text-blue-600"></i> Facebook
+                                    </a>
+                                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('post.show', $post)) }}&text={{ urlencode($post->title) }}" target="_blank" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                        <i class="fab fa-twitter mr-3 text-blue-400"></i> Twitter
+                                    </a>
+                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(route('post.show', $post)) }}" target="_blank" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                        <i class="fab fa-linkedin-in mr-3 text-blue-700"></i> LinkedIn
+                                    </a>
+                                    <a href="https://wa.me/?text={{ urlencode($post->title . ' - ' . route('post.show', $post)) }}" target="_blank" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                        <i class="fab fa-whatsapp mr-3 text-green-500"></i> WhatsApp
+                                    </a>
+                                    <button onclick="copyToClipboard('{{ route('post.show', $post) }}')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                        <i class="fas fa-link mr-3 text-gray-500"></i> Copy Link
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+
                         <!-- Comments Section -->
                         <div class="mt-6 border-t border-gray-100 pt-4 hidden" id="comments-container-{{$post->id}}">
                             <!-- Comment Form -->
                             <form onsubmit="submitComment(event, {{ $post->id }})" id="commentForm-{{$post->id}}" class="mb-4">
                                 @csrf
-                                <div class="flex gap-3 items-center">
-                                    <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/default-avatar.png') }}"
-                                        class="h-8 w-8 rounded-full object-cover">
-                                    <div class="flex-1">
-                                        <textarea name="content" rows="2"
-                                            class="p-1 w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
-                                            placeholder="Write a comment..."></textarea>
+                                <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg transition-all">
+                                    <img src="{{ Auth::user()->profile_picture ? asset('storage/' . Auth::user()->profile_picture) : asset('images/profile-avatar.png') }}"
+                                        class="h-9 w-9 rounded-full object-cover border border-gray-200 shadow-sm">
+                                    <div class="flex-1 relative">
+                                        <textarea name="content" rows="1"
+                                            class="py-2 px-3 w-full rounded-lg border border-gray-200 shadow-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-sm transition-all placeholder-gray-400 resize-none"
+                                            placeholder="Add a comment..."></textarea>
                                     </div>
                                     <button id="submit-comment" type="submit"
-                                        class="px-5 py-2 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700">
-                                        Comment
+                                        class="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-1 shadow-sm">
+                                        <i class="fas fa-paper-plane text-xs"></i>
+                                        <span>Post</span>
                                     </button>
                                 </div>
                             </form>
@@ -133,7 +154,7 @@
                             <div class="space-y-4">
                                 @foreach($post->comments as $comment)
                                     <div class="flex gap-3" id="comment-{{ $comment->id }}">
-                                        <img src="{{ $comment->user->profile_picture ? asset('storage/' . $comment->user->profile_picture) : asset('images/default-avatar.png') }}"
+                                        <img src="{{ $comment->user->profile_picture ? asset('storage/' . $comment->user->profile_picture) : asset('images/profile-avatar.png') }}"
                                             class="h-8 w-8 rounded-full object-cover">
                                         <div class="flex-1">
                                             <div class="bg-gray-50 rounded-lg p-3">
@@ -186,6 +207,30 @@
                 }
             });
         }
+            // Share dropdown
+    function toggleShareDropdown(postId) {
+        const dropdown = document.getElementById(`share-dropdown-${postId}`);
+        dropdown.classList.toggle('hidden');
+
+        document.addEventListener('click', function closeDropdown(e) {
+            if (!e.target.closest(`#share-dropdown-${postId}`) &&
+                !e.target.closest(`button[onclick="toggleShareDropdown(${postId})"]`)) {
+                dropdown.classList.add('hidden');
+                document.removeEventListener('click', closeDropdown);
+            }
+        });
+    }
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const notification = document.createElement('div');
+            notification.textContent = 'Link copied to clipboard!';
+            notification.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm';
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        });
+    }
     </script>
 
 

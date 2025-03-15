@@ -42,9 +42,6 @@
                         <a href="{{route('register')}}" class="bg-amber-500 hover:bg-amber-600 text-white text-center rounded-lg px-6 py-3 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
                             Create Account
                         </a>
-                        <a href="#" class="border border-amber-500 text-amber-500 hover:text-amber-600 hover:border-amber-600 text-center rounded-lg px-6 py-3 transition-all duration-300 transform hover:scale-105">
-                            Learn More
-                        </a>
                     </div>
                 </div>
 

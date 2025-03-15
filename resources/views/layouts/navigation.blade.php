@@ -69,7 +69,7 @@
                         id="user-menu-button">
                         <span class="sr-only">Open user menu</span>
                         <img class="h-8 w-8 rounded-full object-cover"
-                            src="{{Storage::url(Auth::user()->profile_picture) ?? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9UdkG68P9AHESMfKJ-2Ybi9pfnqX1tqx3wQ&s'}}"
+                            src="{{ Auth::user()->profile_picture ? Storage::url(Auth::user()->profile_picture) : asset('images/profile-avatar.png') }}"
                             alt="User avatar">
                     </button>
 
