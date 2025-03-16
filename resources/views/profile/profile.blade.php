@@ -7,7 +7,7 @@
         <div class="relative w-full h-64 overflow-hidden rounded">
           <!-- Cover Image -->
           @empty($user->cover_picture)
-           <img src="https://codetheweb.blog/assets/img/posts/css-advanced-background-images/cover.jpg" alt="Cover Picture" class="w-full h-full object-cover">
+           <img src="https://codetheweb.blog/assets/img/posts/css-advanced-background-images/cover.jpg" alt="Cover Picture" class="w-full h-full object-fit">
           @else
            <img src="{{Storage::url($user->cover_picture)}}" alt="Cover Picture" class="w-full h-full object-cover">
           @endempty
@@ -357,11 +357,11 @@
                                     <img class="h-16 w-16 rounded-full mx-auto object-cover"
                                         src="${connectionUser.profile_picture
                                             ? '/storage/' + connectionUser.profile_picture
-                                            : '/images/default-avatar.png'}"
+                                            : '/images/profile-avatar.png'}"
                                         alt="${connectionUser.name}">
                                 </div>
                                 <p class="mt-2 text-xs text-gray-500">${connectionUser.name}</p>
-                                <a href="/profile/${connectionUser.id}"
+                                <a href="/profile/user/${connectionUser.id}"
                                     class="text-xs text-amber-600 hover:text-amber-700">
                                     View Profile
                                 </a>

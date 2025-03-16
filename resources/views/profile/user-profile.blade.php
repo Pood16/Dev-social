@@ -6,7 +6,7 @@
                 <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
                     <!-- Profile Picture -->
                     <div class="flex-shrink-0">
-                        <img src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('images/default-avatar.png') }}"
+                        <img src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('images/profile-avatar.png') }}"
                             alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover border-4 border-white shadow-lg">
                     </div>
 
@@ -99,7 +99,7 @@
                             <!-- Post Header -->
                             <div class="p-4 flex items-center justify-between">
                                 <div class="flex items-center space-x-4">
-                                    <img src="{{ $post->user->profile_picture ? asset('storage/' . $post->user->profile_picture) : asset('images/default-avatar.png') }}"
+                                    <img src="{{ $post->user->profile_picture ? asset('storage/' . $post->user->profile_picture) : asset('images/profile-avatar.png') }}"
                                         class="h-10 w-10 rounded-full object-cover">
                                     <div>
                                         <h3 class="font-medium text-gray-900">{{ $post->user->name }}</h3>
